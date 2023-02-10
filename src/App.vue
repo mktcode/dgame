@@ -7,7 +7,6 @@ import GameMap from "./components/GameMap.vue";
 import { WelcomeModalState } from "./state/WelcomeModal";
 
 const { isOpen: isWelcomeModalOpen } = WelcomeModalState();
-
 </script>
 
 <template>

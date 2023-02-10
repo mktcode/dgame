@@ -5,17 +5,16 @@ import {
   Dialog,
   DialogPanel,
   DialogTitle,
-} from '@headlessui/vue'
+} from "@headlessui/vue";
 
 defineProps<{
-  isOpen: boolean
-}>()
+  isOpen: boolean;
+}>();
 
 defineEmits<{
-  (e: 'close'): void
-}>()
+  (e: "close"): void;
+}>();
 </script>
-
 
 <template>
   <TransitionRoot appear :show="isOpen" as="template">
@@ -51,7 +50,7 @@ defineEmits<{
               <DialogTitle
                 v-if="$slots.title"
                 as="h3"
-                class="text-lg font-medium leading-6 text-gray-900 mb-2"
+                class="mb-2 text-lg font-medium leading-6 text-gray-900"
               >
                 <slot name="title" />
               </DialogTitle>
