@@ -1,16 +1,23 @@
 <script setup lang="ts">
 import ModalOverlay from "./ModalOverlay.vue";
 import { WelcomeModalState } from "../state/WelcomeModal";
+import { GameMapState } from "@/state/GameMap";
 
 const { isOpen } = WelcomeModalState();
+const { gameMap } = GameMapState();
 
 defineEmits<{
   (e: "close"): void;
 }>();
+
+function close() {
+  isOpen.value = false;
+  gameMap.value?.focus();
+}
 </script>
 
 <template>
-  <ModalOverlay :is-open="isOpen" @close="isOpen = false">
+  <ModalOverlay :is-open="isOpen" @close="close">
     <template #title>
       Welcome commander!
     </template>
@@ -26,7 +33,7 @@ defineEmits<{
       <button
         type="button"
         class="w-full inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-        @click="isOpen = false"
+        @click="close"
       >
         Get started
       </button>

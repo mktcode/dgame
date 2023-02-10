@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { GameMapState } from "../state/GameMap";
 
-const { tilesInfo, position, selectedTile, moveLeft, moveRight, moveUp, moveDown, moveForward, moveBackward } = GameMapState();
+const { gameMap, tilesInfo, position, selectedTile, moveLeft, moveRight, moveUp, moveDown, moveForward, moveBackward } = GameMapState();
 </script>
 
 <template>
   <div
+    ref="gameMap"
     class="grow overflow-hidden bg-slate-900 space-y-1 bg-contain bg-blend-multiply transition-all border-8 border-transparent hover:border-opacity-10 hover:border-white focus:border-opacity-20 focus:border-white"
     :style="{
       backgroundImage: 'url(artwork/spaces/space1.jpeg)',
