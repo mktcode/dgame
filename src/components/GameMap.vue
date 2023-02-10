@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { GameMapState } from "../state/GameMap";
 
-const { position, moveLeft, moveRight, moveUp, moveDown } = GameMapState();
+const { position, selectedTile, moveLeft, moveRight, moveUp, moveDown } = GameMapState();
 </script>
 
 <template>
@@ -17,10 +17,9 @@ const { position, moveLeft, moveRight, moveUp, moveDown } = GameMapState();
       <div
         v-for="x in 20"
         :key="x"
-        class="flex aspect-square w-24 items-center justify-center rounded-lg bg-green-900 text-sm"
-      >
-        {{ x + position.x }}, {{ y + position.y }}
-      </div>
+        class="flex aspect-square w-24 items-center justify-center rounded-lg bg-green-900 text-sm cursor-pointer"
+        @click="selectedTile = { x: x + position.x, y: y + position.y }"
+      />
     </div>
   </div>
 </template>

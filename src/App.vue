@@ -4,9 +4,7 @@ import BuildMenu from "./components/BuildMenu.vue";
 import ResourcesInfo from "./components/ResourcesInfo.vue";
 import WelcomeModal from "./components/WelcomeModal.vue";
 import GameMap from "./components/GameMap.vue";
-import { WelcomeModalState } from "./state/WelcomeModal";
-
-const { isOpen: isWelcomeModalOpen } = WelcomeModalState();
+import TileInfo from "./components/TileInfo.vue";
 </script>
 
 <template>
@@ -15,7 +13,7 @@ const { isOpen: isWelcomeModalOpen } = WelcomeModalState();
     <div class="flex w-60 flex-none flex-col">
       <MiniMap />
       <ResourcesInfo />
-      <button @click="isWelcomeModalOpen = true">?</button>
+      <TileInfo />
       <BuildMenu />
     </div>
   </div>
