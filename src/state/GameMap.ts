@@ -31,6 +31,14 @@ const tilesInfo = ref<{[z: number]: {[y: number]: {[x: number]: TileInfo}}}>({
         image: "artwork/drone.jpeg",
       },
     },
+    10: {
+      10: {
+        type: "destroyer",
+        name: "Destroyer",
+        description: "A destroyer",
+        image: "artwork/destroyer.jpeg",
+      },
+    },
   }
 });
 
