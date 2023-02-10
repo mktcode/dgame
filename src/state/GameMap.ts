@@ -7,7 +7,9 @@ interface TileInfo {
   image: string;
 }
 
-const tilesInfo = ref<{[z: number]: {[y: number]: {[x: number]: TileInfo}}}>({
+const tilesInfo = ref<{
+  [z: number]: { [y: number]: { [x: number]: TileInfo } };
+}>({
   0: {
     0: {
       0: {
@@ -39,19 +41,23 @@ const tilesInfo = ref<{[z: number]: {[y: number]: {[x: number]: TileInfo}}}>({
         image: "artwork/destroyer.jpeg",
       },
     },
-  }
+  },
 });
 
 const gameMap = ref<HTMLElement | null>(null);
 const position = ref({ x: 0, y: 0, z: 0 });
-const selectedTile = ref<{ x: number, y: number, z: number } | null>(null);
+const selectedTile = ref<{ x: number; y: number; z: number } | null>(null);
 
 const selectedTileInfo = computed<TileInfo | null>(() => {
   if (selectedTile.value === null) {
     return null;
   }
-  
-  return tilesInfo.value[selectedTile.value.z]?.[selectedTile.value.y]?.[selectedTile.value.x] ?? null;
+
+  return (
+    tilesInfo.value[selectedTile.value.z]?.[selectedTile.value.y]?.[
+      selectedTile.value.x
+    ] ?? null
+  );
 });
 
 function moveLeft() {

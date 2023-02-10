@@ -1,13 +1,24 @@
 <script setup lang="ts">
 import { GameMapState } from "../state/GameMap";
 
-const { gameMap, tilesInfo, position, selectedTile, moveLeft, moveRight, moveUp, moveDown, moveForward, moveBackward } = GameMapState();
+const {
+  gameMap,
+  tilesInfo,
+  position,
+  selectedTile,
+  moveLeft,
+  moveRight,
+  moveUp,
+  moveDown,
+  moveForward,
+  moveBackward,
+} = GameMapState();
 </script>
 
 <template>
   <div
     ref="gameMap"
-    class="grow overflow-hidden bg-slate-900 space-y-1 bg-contain bg-blend-multiply transition-all border-8 border-transparent hover:border-opacity-10 hover:border-sky-500 focus:border-opacity-50 focus:border-sky-900"
+    class="grow space-y-1 overflow-hidden border-8 border-transparent bg-slate-900 bg-contain bg-blend-multiply transition-all hover:border-sky-500 hover:border-opacity-10 focus:border-sky-900 focus:border-opacity-50"
     :style="{
       backgroundImage: 'url(artwork/spaces/space1.jpeg)',
       backgroundPositionX: position.x + '%',
@@ -26,13 +37,20 @@ const { gameMap, tilesInfo, position, selectedTile, moveLeft, moveRight, moveUp,
       <div
         v-for="x in 20"
         :key="x"
-        class="flex aspect-square w-24 items-center justify-center rounded-lg bg-sky-900 text-sm cursor-pointer overflow-hidden"
+        class="flex aspect-square w-24 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-sky-900 text-sm"
         :class="{
-          'opacity-10 hover:opacity-20': !tilesInfo[position.z]?.[y + position.y]?.[x + position.x]
+          'opacity-10 hover:opacity-20':
+            !tilesInfo[position.z]?.[y + position.y]?.[x + position.x],
         }"
-        @click="selectedTile = { x: x + position.x, y: y + position.y, z: position.z }"
+        @click="
+          selectedTile = { x: x + position.x, y: y + position.y, z: position.z }
+        "
       >
-       <img v-if="tilesInfo[position.z]?.[y + position.y]?.[x + position.x]" :src="tilesInfo[position.z]?.[y + position.y]?.[x + position.x].image" alt="Tile" />
+        <img
+          v-if="tilesInfo[position.z]?.[y + position.y]?.[x + position.x]"
+          :src="tilesInfo[position.z]?.[y + position.y]?.[x + position.x].image"
+          alt="Tile"
+        />
       </div>
     </div>
   </div>
