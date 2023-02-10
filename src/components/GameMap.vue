@@ -6,12 +6,12 @@ const { tilesInfo, position, selectedTile, moveLeft, moveRight, moveUp, moveDown
 
 <template>
   <div
-    class="grow overflow-hidden bg-slate-900 space-y-1 bg-contain bg-blend-multiply transition-all"
+    class="grow overflow-hidden bg-slate-900 space-y-1 bg-contain bg-blend-multiply transition-all border-8 border-transparent hover:border-opacity-10 hover:border-white focus:border-opacity-20 focus:border-white"
     :style="{
       backgroundImage: 'url(artwork/spaces/space1.jpeg)',
       backgroundPositionX: position.x + '%',
       backgroundPositionY: position.y + '%',
-      backgroundSize: position.z + 300 + '%',
+      backgroundSize: position.z * 2 + 300 + '%',
     }"
     tabindex="1"
     @keyup.left="moveLeft"
