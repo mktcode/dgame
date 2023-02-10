@@ -6,6 +6,6 @@ const { selectedTile } = GameMapState();
 
 <template>
   <div class="text-center text-sm">
-    Tile {{ selectedTile.x }}/{{ selectedTile.y }}
+    Tile {{ selectedTile.x }}/{{ selectedTile.y }}/{{ selectedTile.z }}
   </div>
 </template>
