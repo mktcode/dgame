@@ -5,7 +5,7 @@ const { selectedTile, selectedTileInfo } = GameMapState();
 </script>
 
 <template>
-  <div class="grow overflow-y-auto bg-gray-600">
+  <div class="grow overflow-y-auto bg-sky-900">
     <div class="flex justify-between items-center">
       <div v-if="selectedTile" class="text-lg p-1 text-slate-300 font-bold">
         {{ selectedTile.x }}/{{ selectedTile.y }}/{{ selectedTile.z }}
