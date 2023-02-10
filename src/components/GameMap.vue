@@ -6,7 +6,7 @@ const { tilesInfo, position, selectedTile, moveLeft, moveRight, moveUp, moveDown
 
 <template>
   <div
-    class="grow overflow-hidden bg-slate-900 space-y-1 bg-contain bg-blend-multiply"
+    class="grow overflow-hidden bg-slate-900 space-y-1 bg-contain bg-blend-multiply transition-all"
     :style="{
       backgroundImage: 'url(artwork/spaces/space1.jpeg)',
       backgroundPositionX: position.x + '%',
