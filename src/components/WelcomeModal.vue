@@ -18,15 +18,16 @@ defineEmits<{
     </template>
     <template #body>
       <p class="text-sm text-gray-500">
-        This is a game about building a city. You can build buildings and
-        resources will be generated. You can also build units to attack other
-        players.
+        This is an open source sci-fi browser game. You can play it for free but you can also earn and spend cryptocurrency and NFTs.
+      </p>
+      <p class="text-sm text-gray-500 mt-5">
+        Use arrow keys to navigate through space on the X and Y axis. Use Shift+Up and Shift+Down to move along the Z axis.
       </p>
     </template>
     <template #footer>
       <button
         type="button"
-        class="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+        class="w-full inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
         @click="isOpen = false"
       >
         Get started
