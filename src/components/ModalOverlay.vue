@@ -50,11 +50,11 @@ defineEmits<{
               <DialogTitle
                 v-if="$slots.title"
                 as="h3"
-                class="mb-2 text-lg font-medium leading-6 text-gray-900"
+                class="mb-2 text-2xl text-center font-medium leading-6 text-gray-900"
               >
                 <slot name="title" />
               </DialogTitle>
-              <div v-if="$slots.body" class="p-3">
+              <div v-if="$slots.body" class="py-3">
                 <slot name="body" />
               </div>
 

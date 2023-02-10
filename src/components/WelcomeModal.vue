@@ -12,16 +12,14 @@ defineEmits<{
 <template>
   <ModalOverlay :is-open="isOpen" @close="isOpen = false">
     <template #title>
-      <h3 class="mb-2 text-lg font-medium leading-6 text-gray-900">
-        Welcome to the game!
-      </h3>
+      Welcome commander!
     </template>
     <template #body>
-      <p class="text-sm text-gray-500">
+      <p class="text-gray-500">
         This is an open source sci-fi browser game. You can play it for free but you can also earn and spend cryptocurrency and NFTs.
       </p>
-      <p class="text-sm text-gray-500 mt-5">
-        Use arrow keys to navigate through space on the X and Y axis. Use Shift+Up and Shift+Down to move along the Z axis.
+      <p class="text-xl text-gray-500 mt-5">
+        Use <strong>arrow keys</strong> to navigate through space on the <strong>X and Y</strong> axis. <strong>Hold shift</strong> and use up and down arrow keys to move along the <strong>Z axis</strong>.
       </p>
     </template>
     <template #footer>

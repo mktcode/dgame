@@ -8,15 +8,6 @@
       </div>
       <div class="aspect-square bg-sky-700"></div>
       <div class="aspect-square bg-sky-800"></div>
-      <div class="aspect-square bg-sky-800"></div>
-      <div class="aspect-square bg-sky-800"></div>
-      <div class="aspect-square bg-sky-800"></div>
-      <div class="aspect-square bg-sky-800"></div>
-      <div class="aspect-square bg-sky-800"></div>
-      <div class="aspect-square bg-sky-800"></div>
-      <div class="aspect-square bg-sky-800"></div>
-      <div class="aspect-square bg-sky-800"></div>
-      <div class="aspect-square bg-sky-800"></div>
     </div>
   </div>
 </template>

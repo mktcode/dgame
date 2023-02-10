@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import MiniMap from "./components/MiniMap.vue";
 import BuildMenu from "./components/BuildMenu.vue";
 import ResourcesInfo from "./components/ResourcesInfo.vue";
 import WelcomeModal from "./components/WelcomeModal.vue";
@@ -14,7 +13,6 @@ const { selectedTile } = GameMapState();
   <div class="flex h-screen">
     <GameMap />
     <div class="flex w-60 flex-none flex-col">
-      <MiniMap />
       <ResourcesInfo />
       <TileInfo v-if="selectedTile" />
       <BuildMenu v-else />
