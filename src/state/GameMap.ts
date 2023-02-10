@@ -44,7 +44,7 @@ const tilesInfo = ref<{[z: number]: {[y: number]: {[x: number]: TileInfo}}}>({
 
 const gameMap = ref<HTMLElement | null>(null);
 const position = ref({ x: 0, y: 0, z: 0 });
-const selectedTile = ref<{ x: number, y: number, z: number } | null>({ x: 0, y: 0, z: 0 });
+const selectedTile = ref<{ x: number, y: number, z: number } | null>(null);
 
 const selectedTileInfo = computed<TileInfo | null>(() => {
   if (selectedTile.value === null) {
