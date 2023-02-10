@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { GameMapState } from "../state/GameMap";
 
-const { position, selectedTile, moveLeft, moveRight, moveUp, moveDown, moveForward, moveBackward } = GameMapState();
+const { tilesInfo, position, selectedTile, moveLeft, moveRight, moveUp, moveDown, moveForward, moveBackward } = GameMapState();
 </script>
 
 <template>
   <div
-    class="grow overflow-hidden bg-green-800 space-y-1"
+    class="grow overflow-hidden bg-slate-900 space-y-1"
     tabindex="1"
     @keyup.left="moveLeft"
     @keyup.right="moveRight"
@@ -19,9 +19,11 @@ const { position, selectedTile, moveLeft, moveRight, moveUp, moveDown, moveForwa
       <div
         v-for="x in 20"
         :key="x"
-        class="flex aspect-square w-24 items-center justify-center rounded-lg bg-green-900 text-sm cursor-pointer"
+        class="flex aspect-square w-24 items-center justify-center rounded-lg bg-sky-900 text-sm cursor-pointer overflow-hidden"
         @click="selectedTile = { x: x + position.x, y: y + position.y, z: position.z }"
-      />
+      >
+       <img v-if="tilesInfo[position.z]?.[y + position.y]?.[x + position.x]" :src="tilesInfo[position.z]?.[y + position.y]?.[x + position.x].image" alt="Tile" />
+      </div>
     </div>
   </div>
 </template>

@@ -5,6 +5,9 @@ import ResourcesInfo from "./components/ResourcesInfo.vue";
 import WelcomeModal from "./components/WelcomeModal.vue";
 import GameMap from "./components/GameMap.vue";
 import TileInfo from "./components/TileInfo.vue";
+import { GameMapState } from "./state/GameMap";
+
+const { selectedTile } = GameMapState();
 </script>
 
 <template>
@@ -13,8 +16,8 @@ import TileInfo from "./components/TileInfo.vue";
     <div class="flex w-60 flex-none flex-col">
       <MiniMap />
       <ResourcesInfo />
-      <TileInfo />
-      <BuildMenu />
+      <TileInfo v-if="selectedTile" />
+      <BuildMenu v-else />
     </div>
   </div>
   <WelcomeModal />
