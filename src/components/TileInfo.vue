@@ -32,10 +32,10 @@ async function mintNft() {
     event.removeListener();
 
     indexer.get(coords.x).get(coords.y).get(coords.z).put(tokenId)
-    indexer.get(tokenId).get("type").put("base")
-    indexer.get(tokenId).get("name").put("Base")
-    indexer.get(tokenId).get("description").put("A player's base")
-    indexer.get(tokenId).get("image").put("artwork/base.jpeg")
+    indexer.get(tokenId.toString()).get("type").put("base")
+    indexer.get(tokenId.toString()).get("name").put("Base")
+    indexer.get(tokenId.toString()).get("description").put("A player's base")
+    indexer.get(tokenId.toString()).get("image").put("artwork/base.jpeg")
   });
 
   const tx = await contract.safeMint(selectedTile.value.x, selectedTile.value.y, selectedTile.value.z);
