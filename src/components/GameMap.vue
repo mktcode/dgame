@@ -37,7 +37,7 @@ const {
       <div
         v-for="x in 20"
         :key="x"
-        class="flex aspect-square min-w-[3.5rem] w-24 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-sky-900 text-sm"
+        class="flex aspect-square w-24 min-w-[3.5rem] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-sky-900 text-sm"
         :class="{
           'opacity-10 hover:opacity-20':
             !tilesInfo[position.z]?.[y + position.y]?.[x + position.x],

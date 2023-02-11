@@ -44,10 +44,14 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable {
   }
   /** End required overrides */
 
-  function safeMint(address to, int256 x, int256 y, int256 z) public onlyAvailableCoords(x, y, z) {
+  function safeMint(int256 x, int256 y, int256 z) public onlyAvailableCoords(x, y, z) {
     uint256 tokenId = _tokenIdCounter.current();
     _tokenIdCounter.increment();
-    _safeMint(to, tokenId);
+
+    tokenIdsByCoordinate[x][y][z] = tokenId;
+    coordinatesByTokenId[tokenId] = Coordinate(x, y, z);
+    
+    _safeMint(msg.sender, tokenId);
   }
 
   function updateUri(uint256 tokenId, string memory uri) public {

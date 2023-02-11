@@ -1,7 +1,27 @@
 <script setup lang="ts">
+import { Contract, ethers } from "ethers";
 import { GameMapState } from "../state/GameMap";
+import DGAME_ABI from "../contracts/DGame.json";
 
 const { selectedTile, selectedTileInfo } = GameMapState();
+
+async function mintNft() {
+  if (!selectedTile.value) return;
+
+  let signer = null;
+  let provider;
+  if (window.ethereum == null) {
+    console.log("MetaMask not installed.");
+    return;
+  }
+  provider = new ethers.BrowserProvider(window.ethereum);
+  signer = await provider.getSigner();
+
+  const contract = new Contract(import.meta.env.VITE_DGAME_CONTRACT_ADDRESS, DGAME_ABI, signer);
+
+  const tx = await contract.safeMint(selectedTile.value.x, selectedTile.value.y, selectedTile.value.z);
+  await tx.wait();
+}
 </script>
 
 <template>
@@ -29,7 +49,7 @@ const { selectedTile, selectedTileInfo } = GameMapState();
       >
         ?
       </div>
-      <button class="w-full">Explore</button>
+      <button class="w-full" @click="mintNft">Explore</button>
     </div>
   </div>
 </template>
