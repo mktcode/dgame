@@ -17,8 +17,11 @@ indexer
   .get(props.x.toString())
   .get(props.y.toString())
   .get(props.z.toString())
-  .once((data) => {
-    tileInfo.value = data;
+  .once((tokenId) => {
+    if (tokenId === undefined) return;
+    indexer.get(tokenId.toString()).once((data) => {
+      tileInfo.value = data;
+    });
   });
 </script>
 

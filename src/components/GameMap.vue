@@ -32,9 +32,9 @@ const {
     @keyup.shift.down="moveBackward"
     @keyup.shift.up="moveForward"
   >
-    <div v-for="y in 20" :key="y" class="flex space-x-1">
+    <div v-for="y in 15" :key="y" class="flex space-x-1">
       <Tile
-        v-for="x in 20"
+        v-for="x in 15"
         :key="x + y + position.z.toString()"
         :x="BigInt(x)"
         :y="BigInt(y)"

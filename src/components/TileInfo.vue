@@ -35,7 +35,7 @@ async function mintNft() {
 
     event.removeListener();
 
-    indexer.get(coords.x).get(coords.y).get(coords.z).put(tokenId);
+    indexer.get(coords.x).get(coords.y).get(coords.z).put(tokenId.toString());
     indexer.get(tokenId.toString()).get("type").put("base");
     indexer.get(tokenId.toString()).get("name").put("Base");
     indexer.get(tokenId.toString()).get("description").put("A player's base");
