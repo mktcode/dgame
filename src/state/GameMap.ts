@@ -10,31 +10,31 @@ export interface TileInfo {
 const tilesInfo = ref<{
   [z: string]: { [y: string]: { [x: string]: TileInfo } };
 }>({
-  '0': {
-    '0': {
-      '0': {
+  "0": {
+    "0": {
+      "0": {
         type: "empty",
         name: "Empty",
         description: "Empty space",
         image: "artwork/empty.jpeg",
       },
-      '4': {
+      "4": {
         type: "base",
         name: "Base",
         description: "A player's base",
         image: "artwork/base.jpeg",
       },
     },
-    '4': {
-      '8': {
+    "4": {
+      "8": {
         type: "drone",
         name: "Drone",
         description: "A drone",
         image: "artwork/drone.jpeg",
       },
     },
-    '10': {
-      '10': {
+    "10": {
+      "10": {
         type: "destroyer",
         name: "Destroyer",
         description: "A destroyer",
@@ -54,9 +54,9 @@ const selectedTileInfo = computed<TileInfo | null>(() => {
   }
 
   return (
-    tilesInfo.value[selectedTile.value.z.toString()]?.[selectedTile.value.y.toString()]?.[
-      selectedTile.value.x.toString()
-    ] ?? null
+    tilesInfo.value[selectedTile.value.z.toString()]?.[
+      selectedTile.value.y.toString()
+    ]?.[selectedTile.value.x.toString()] ?? null
   );
 });
 

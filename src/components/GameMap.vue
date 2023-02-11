@@ -33,7 +33,13 @@ const {
     @keyup.shift.up="moveForward"
   >
     <div v-for="y in 20" :key="y" class="flex space-x-1">
-      <Tile v-for="x in 20" :key="x + y + position.z.toString()" :x="BigInt(x)" :y="BigInt(y)" :z="position.z" />
+      <Tile
+        v-for="x in 20"
+        :key="x + y + position.z.toString()"
+        :x="BigInt(x)"
+        :y="BigInt(y)"
+        :z="position.z"
+      />
     </div>
   </div>
 </template>

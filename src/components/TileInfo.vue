@@ -22,25 +22,32 @@ async function mintNft() {
 
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   await provider.send("eth_requestAccounts", []);
-  const signer = provider.getSigner()
+  const signer = provider.getSigner();
 
-  const contract = new Contract(import.meta.env.VITE_DGAME_CONTRACT_ADDRESS, DGAME_ABI, signer);
+  const contract = new Contract(
+    import.meta.env.VITE_DGAME_CONTRACT_ADDRESS,
+    DGAME_ABI,
+    signer
+  );
 
   contract.on("Transfer", (_from, to, tokenId, event) => {
     console.log(`Minted NFT ${tokenId} to ${to}`);
 
     event.removeListener();
 
-    indexer.get(coords.x).get(coords.y).get(coords.z).put(tokenId)
-    indexer.get(tokenId.toString()).get("type").put("base")
-    indexer.get(tokenId.toString()).get("name").put("Base")
-    indexer.get(tokenId.toString()).get("description").put("A player's base")
-    indexer.get(tokenId.toString()).get("image").put("artwork/base.jpeg")
+    indexer.get(coords.x).get(coords.y).get(coords.z).put(tokenId);
+    indexer.get(tokenId.toString()).get("type").put("base");
+    indexer.get(tokenId.toString()).get("name").put("Base");
+    indexer.get(tokenId.toString()).get("description").put("A player's base");
+    indexer.get(tokenId.toString()).get("image").put("artwork/base.jpeg");
   });
 
-  const tx = await contract.safeMint(selectedTile.value.x, selectedTile.value.y, selectedTile.value.z);
+  const tx = await contract.safeMint(
+    selectedTile.value.x,
+    selectedTile.value.y,
+    selectedTile.value.z
+  );
   await tx.wait();
-
 }
 </script>
 
