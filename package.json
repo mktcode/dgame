@@ -13,7 +13,8 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.9",
     "@openzeppelin/contracts": "^4.8.1",
-    "ethers": "^6.0.2",
+    "ethers": "^5.7.2",
+    "gun": "^0.2020.1239",
     "vue": "^3.2.45"
   },
   "devDependencies": {

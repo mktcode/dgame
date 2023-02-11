@@ -1,6 +1,6 @@
 import { computed, ref } from "vue";
 
-interface TileInfo {
+export interface TileInfo {
   type: string;
   name: string;
   description: string;
@@ -8,33 +8,33 @@ interface TileInfo {
 }
 
 const tilesInfo = ref<{
-  [z: number]: { [y: number]: { [x: number]: TileInfo } };
+  [z: string]: { [y: string]: { [x: string]: TileInfo } };
 }>({
-  0: {
-    0: {
-      0: {
+  '0': {
+    '0': {
+      '0': {
         type: "empty",
         name: "Empty",
         description: "Empty space",
         image: "artwork/empty.jpeg",
       },
-      4: {
+      '4': {
         type: "base",
         name: "Base",
         description: "A player's base",
         image: "artwork/base.jpeg",
       },
     },
-    4: {
-      8: {
+    '4': {
+      '8': {
         type: "drone",
         name: "Drone",
         description: "A drone",
         image: "artwork/drone.jpeg",
       },
     },
-    10: {
-      10: {
+    '10': {
+      '10': {
         type: "destroyer",
         name: "Destroyer",
         description: "A destroyer",
@@ -45,8 +45,8 @@ const tilesInfo = ref<{
 });
 
 const gameMap = ref<HTMLElement | null>(null);
-const position = ref({ x: 0, y: 0, z: 0 });
-const selectedTile = ref<{ x: number; y: number; z: number } | null>(null);
+const position = ref({ x: 0n, y: 0n, z: 0n });
+const selectedTile = ref<{ x: bigint; y: bigint; z: bigint } | null>(null);
 
 const selectedTileInfo = computed<TileInfo | null>(() => {
   if (selectedTile.value === null) {
@@ -54,34 +54,34 @@ const selectedTileInfo = computed<TileInfo | null>(() => {
   }
 
   return (
-    tilesInfo.value[selectedTile.value.z]?.[selectedTile.value.y]?.[
-      selectedTile.value.x
+    tilesInfo.value[selectedTile.value.z.toString()]?.[selectedTile.value.y.toString()]?.[
+      selectedTile.value.x.toString()
     ] ?? null
   );
 });
 
 function moveLeft() {
-  position.value.x -= 1;
+  position.value.x -= 1n;
 }
 
 function moveRight() {
-  position.value.x += 1;
+  position.value.x += 1n;
 }
 
 function moveUp() {
-  position.value.y -= 1;
+  position.value.y -= 1n;
 }
 
 function moveDown() {
-  position.value.y += 1;
+  position.value.y += 1n;
 }
 
 function moveForward() {
-  position.value.z += 1;
+  position.value.z += 1n;
 }
 
 function moveBackward() {
-  position.value.z -= 1;
+  position.value.z -= 1n;
 }
 
 export function GameMapState() {

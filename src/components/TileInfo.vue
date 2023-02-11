@@ -2,25 +2,45 @@
 import { Contract, ethers } from "ethers";
 import { GameMapState } from "../state/GameMap";
 import DGAME_ABI from "../contracts/DGame.json";
+import { indexer } from "../state/Gun";
 
 const { selectedTile, selectedTileInfo } = GameMapState();
 
 async function mintNft() {
   if (!selectedTile.value) return;
 
-  let signer = null;
-  let provider;
+  const coords = {
+    x: selectedTile.value.x.toString(),
+    y: selectedTile.value.y.toString(),
+    z: selectedTile.value.z.toString(),
+  };
+
   if (window.ethereum == null) {
     console.log("MetaMask not installed.");
     return;
   }
-  provider = new ethers.BrowserProvider(window.ethereum);
-  signer = await provider.getSigner();
+
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  const signer = provider.getSigner()
 
   const contract = new Contract(import.meta.env.VITE_DGAME_CONTRACT_ADDRESS, DGAME_ABI, signer);
 
+  contract.on("Transfer", (_from, to, tokenId, event) => {
+    console.log(`Minted NFT ${tokenId} to ${to}`);
+
+    event.removeListener();
+
+    indexer.get(coords.x).get(coords.y).get(coords.z).put(tokenId)
+    indexer.get(tokenId).get("type").put("base")
+    indexer.get(tokenId).get("name").put("Base")
+    indexer.get(tokenId).get("description").put("A player's base")
+    indexer.get(tokenId).get("image").put("artwork/base.jpeg")
+  });
+
   const tx = await contract.safeMint(selectedTile.value.x, selectedTile.value.y, selectedTile.value.z);
   await tx.wait();
+
 }
 </script>
 
