@@ -1,10 +1,34 @@
 <script setup lang="ts">
+import { ref, watch } from "vue";
 import { Contract, ethers } from "ethers";
-import { GameMapState } from "../state/GameMap";
+import { GameMapState, type TileInfo } from "../state/GameMap";
 import DGAME_ABI from "../contracts/DGame.json";
 import { indexer } from "../state/Gun";
 
-const { selectedTile, selectedTileInfo } = GameMapState();
+const { selectedTile } = GameMapState();
+
+const selectedTileInfo = ref<TileInfo | null>(null);
+
+watch(selectedTile, () => {
+  if (!selectedTile.value) return null;
+
+  const coords = {
+    x: selectedTile.value.x.toString(),
+    y: selectedTile.value.y.toString(),
+    z: selectedTile.value.z.toString(),
+  };
+
+  indexer.get(coords.x).get(coords.y).get(coords.z).once((tokenId) => {
+    if (tokenId === undefined) {
+      selectedTileInfo.value = null;
+      return;
+    }
+    
+    indexer.get(tokenId.toString()).once((data) => {
+      selectedTileInfo.value = data;
+    });
+  });
+});
 
 async function mintNft() {
   if (!selectedTile.value) return;
