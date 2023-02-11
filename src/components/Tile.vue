@@ -27,7 +27,7 @@ indexer
 
 <template>
   <div
-    class="flex aspect-square w-24 min-w-[3.5rem] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-sky-900 text-sm"
+    class="flex aspect-square w-28 min-w-[3.5rem] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-sky-900 text-sm"
     :class="{ 'opacity-10 hover:opacity-20': !tileInfo }"
     @click="selectedTile = { x, y, z }"
   >
