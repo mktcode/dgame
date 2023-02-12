@@ -51,7 +51,6 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
   function safeMint(int256 x, int256 y, int256 z) public payable onlyAvailableCoords(x, y, z) {
     uint256 price = getMintPrice(_msgSender());
     require(msg.value >= price, "Not enough ETH to mint");
-    payable(owner()).transfer(msg.value);
 
     uint256 tokenId = _tokenIdCounter.current();
     _tokenIdCounter.increment();
@@ -60,6 +59,7 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
     coordinatesByTokenId[tokenId] = Coordinate(x, y, z);
     
     _safeMint(_msgSender(), tokenId);
+    payable(owner()).transfer(msg.value);
   }
 
   function updateUri(uint256 tokenId, string memory uri) public {
@@ -72,16 +72,16 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
 
     uint256 price = getTokenLevelPrice(tokenId);
     require(msg.value >= price, "Not enough ETH to level up");
-    payable(owner()).transfer(msg.value);
     tokenLevels[tokenId] += 1;
+    payable(owner()).transfer(msg.value);
   }
 
   function getTokenLevelPrice(uint256 tokenId) public view returns (uint256) {
     return LEVEL_BASE_PRICE * 2 ** tokenLevels[tokenId];
   }
 
-  function getMintPrice(address owner) public view returns (uint256) {
-    uint256 ownedTokens = balanceOf(owner);
+  function getMintPrice(address tokenOwner) public view returns (uint256) {
+    uint256 ownedTokens = balanceOf(tokenOwner);
     return COORD_BASE_PRICE * 2 ** ownedTokens;    
   }
 }

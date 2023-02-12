@@ -1,6 +1,7 @@
 import { ref } from "vue";
 
 export interface TileInfo {
+  level: bigint;
   type: string;
   name: string;
   description: string;
