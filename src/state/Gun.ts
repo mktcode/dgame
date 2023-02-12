@@ -1,4 +1,5 @@
 import Gun from "gun/gun";
+import "gun/lib/yson";
 import "gun/lib/radix";
 import "gun/lib/radisk";
 import "gun/lib/store";

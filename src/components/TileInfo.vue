@@ -18,13 +18,13 @@ watch(selectedTile, () => {
     z: selectedTile.value.z.toString(),
   };
 
-  indexer.get(coords.x).get(coords.y).get(coords.z).once((tokenId) => {
+  indexer.get('coords').get(coords.x).get(coords.y).get(coords.z).once((tokenId) => {
     if (tokenId === undefined) {
       selectedTileInfo.value = null;
       return;
     }
     
-    indexer.get(tokenId.toString()).once((data) => {
+    indexer.get('tokens').get(tokenId.toString()).once((data) => {
       selectedTileInfo.value = data;
     });
   });
@@ -59,11 +59,11 @@ async function mintNft() {
 
     event.removeListener();
 
-    indexer.get(coords.x).get(coords.y).get(coords.z).put(tokenId.toString());
-    indexer.get(tokenId.toString()).get("type").put("base");
-    indexer.get(tokenId.toString()).get("name").put("Base");
-    indexer.get(tokenId.toString()).get("description").put("A player's base");
-    indexer.get(tokenId.toString()).get("image").put("artwork/base.jpeg");
+    indexer.get('tokens').get(tokenId.toString()).get("type").put("base");
+    indexer.get('tokens').get(tokenId.toString()).get("name").put("Base");
+    indexer.get('tokens').get(tokenId.toString()).get("description").put("A player's base");
+    indexer.get('tokens').get(tokenId.toString()).get("image").put("artwork/base.jpeg");
+    indexer.get('coords').get(coords.x).get(coords.y).get(coords.z).put(tokenId.toString());
   });
 
   const tx = await contract.safeMint(

@@ -12,7 +12,10 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.9",
+    "@jamescoyle/vue-icon": "^0.1.2",
+    "@mdi/js": "^7.1.96",
     "@openzeppelin/contracts": "^4.8.1",
+    "@vueuse/core": "^9.12.0",
     "ethers": "^5.7.2",
     "gun": "^0.2020.1239",
     "vue": "^3.2.45"

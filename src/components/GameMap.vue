@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import Tile from "./Tile.vue";
 import { GameMapState } from "../state/GameMap";
 
@@ -12,6 +13,26 @@ const {
   moveForward,
   moveBackward,
 } = GameMapState();
+
+const visibleTilesX = computed(() => {
+  const tiles = [];
+
+  for (let i = position.value.x; i < position.value.x + 15n; i++) {
+    tiles.push(i);
+  }
+
+  return tiles;
+});
+
+const visibleTilesY = computed(() => {
+  const tiles = [];
+
+  for (let i = position.value.y; i < position.value.y + 15n; i++) {
+    tiles.push(i);
+  }
+
+  return tiles;
+});
 </script>
 
 <template>
@@ -32,12 +53,12 @@ const {
     @keyup.shift.down="moveBackward"
     @keyup.shift.up="moveForward"
   >
-    <div v-for="y in 15" :key="y" class="flex space-x-1">
+    <div v-for="y in visibleTilesY" :key="`y-${y.toString()}`" class="flex space-x-1">
       <Tile
-        v-for="x in 15"
-        :key="x + y + position.z.toString()"
-        :x="BigInt(x)"
-        :y="BigInt(y)"
+        v-for="x in visibleTilesX"
+        :key="`${x}-${y}-${position.z.toString()}`"
+        :x="x"
+        :y="y"
         :z="position.z"
       />
     </div>
