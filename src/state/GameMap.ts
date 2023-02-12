@@ -11,7 +11,6 @@ export interface TileInfo {
 const gameMap = ref<HTMLElement | null>(null);
 const position = ref({ x: 0n, y: 0n, z: 0n });
 const selectedTile = ref<{ x: bigint; y: bigint; z: bigint } | null>(null);
-const tilesLoading = ref(0);
 
 export enum Direction {
   Left = "left",
@@ -22,8 +21,10 @@ export enum Direction {
   Backward = "backward",
 }
 
+let movingIsBlocked = false;
 function move(direction: Direction) {
-  if (tilesLoading.value > 0) return;
+  if (movingIsBlocked) return;
+  movingIsBlocked = true;
 
   switch (direction) {
     case Direction.Left:
@@ -45,6 +46,10 @@ function move(direction: Direction) {
       moveBackward();
       break;
   }
+
+  setTimeout(() => {
+    movingIsBlocked = false;
+  }, 500);
 }
 
 function moveLeft() {
@@ -76,7 +81,6 @@ export function GameMapState() {
     gameMap,
     position,
     selectedTile,
-    tilesLoading,
     move,
   };
 }

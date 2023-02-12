@@ -23,6 +23,7 @@ const selectedTileInfo = ref<TileInfo | null>(null);
 const existingTokenId = ref<bigint | null>(null);
 const mintPrice = ref<bigint | null>(null);
 const levelPrice = ref<bigint | null>(null);
+const tokenOwner = ref<string | null>(null);
 const isOwner = ref(false);
 
 async function getMintPriceForAccount() {
@@ -59,8 +60,8 @@ async function getIsOwner() {
   }
 
   const accounts = await provider.send("eth_requestAccounts", []);
-  const tokenOwner = await contract.ownerOf(existingTokenId.value.toString());
-  isOwner.value = tokenOwner.toLowerCase() === accounts[0].toLowerCase();
+  tokenOwner.value = await contract.ownerOf(existingTokenId.value.toString()) as string;
+  isOwner.value = tokenOwner.value.toLowerCase() === accounts[0].toLowerCase();
 }
 
 watch(selectedTile, () => {
@@ -80,12 +81,15 @@ watch(selectedTile, () => {
     getIsOwner();
     getLevelPriceForToken();
 
-    if (tokenId === undefined) {
+    if (typeof tokenId !== "string") {
       selectedTileInfo.value = null;
       return;
     }
     
     indexer.get('tokens').get(tokenId.toString()).once((data) => {
+      if (data && data.level.length > 0) {
+        data.level = BigInt(data.level);
+      }
       selectedTileInfo.value = data;
     });
   });
@@ -113,11 +117,11 @@ async function mintNft() {
 
     event.removeListener();
 
-    indexer.get('tokens').get(tokenId.toString()).get("level").put(1n);
+    indexer.get('tokens').get(tokenId.toString()).get("level").put('1');
     indexer.get('tokens').get(tokenId.toString()).get("type").put("base");
     indexer.get('tokens').get(tokenId.toString()).get("name").put("Base");
     indexer.get('tokens').get(tokenId.toString()).get("description").put("A player's base");
-    indexer.get('tokens').get(tokenId.toString()).get("image").put("artwork/base.jpeg");
+    indexer.get('tokens').get(tokenId.toString()).get("image").put("artwork/base2.jpeg");
     indexer.get('coords').get(coords.x).get(coords.y).get(coords.z).put(tokenId.toString());
   });
 
@@ -144,52 +148,98 @@ async function levelUp() {
     value: levelPrice.value,
   });
   await tx.wait();
-  indexer.get('tokens').get(existingTokenId.value.toString()).get("level").put(selectedTileInfo.value.level + 1n);
+  indexer.get('tokens').get(existingTokenId.value.toString()).get("level").put((selectedTileInfo.value.level + 1n).toString());
 }
 
 async function updateFromChain() {
   if (!selectedTile.value) return;
 
-  // TODO: Implement
+  if (window.ethereum == null) {
+    console.log("MetaMask not installed.");
+    return;
+  }
+
+  const coords = {
+    x: selectedTile.value.x.toString(),
+    y: selectedTile.value.y.toString(),
+    z: selectedTile.value.z.toString(),
+  };
+
+  const tokenId = await contract.tokenIdsByCoordinate(coords.x, coords.y, coords.z);
+  
+  if (tokenId.eq(0)) {
+    selectedTileInfo.value = null;
+    indexer.get('coords').get(coords.x).get(coords.y).get(coords.z).put(null);
+  } else {
+    // const tokenUri = await contract.tokenURI(tokenId);
+    // const response = await fetch(tokenUri);
+    // const json = await response.json();
+
+    const tileInfo: TileInfo = {
+      level: await contract.tokenLevels(tokenId),
+      type: 'base',
+      name: 'Base',
+      description: 'A player\'s base.',
+      image: 'artwork/base2.jpeg',
+    };
+
+    indexer.get('tokens').get(tokenId.toString()).get("level").put(tileInfo.level.toString());
+    indexer.get('tokens').get(tokenId.toString()).get("type").put(tileInfo.type);
+    indexer.get('tokens').get(tokenId.toString()).get("name").put(tileInfo.name);
+    indexer.get('tokens').get(tokenId.toString()).get("description").put(tileInfo.description);
+    indexer.get('tokens').get(tokenId.toString()).get("image").put(tileInfo.image);
+    indexer.get('coords').get(coords.x).get(coords.y).get(coords.z).put(tokenId.toString());
+  }
 }
 </script>
 
 <template>
   <div class="grow overflow-y-auto bg-sky-900">
-    <div class="flex items-center justify-between">
-      <div v-if="selectedTile" class="p-1 text-lg font-bold text-slate-300 mr-auto">
-        {{ selectedTile.x }}/{{ selectedTile.y }}/{{ selectedTile.z }}
+    <div v-if="selectedTile">
+      <div class="flex items-center justify-between">
+        <div class="p-1 text-lg font-bold text-slate-300 mr-auto">
+          {{ selectedTile.x }}/{{ selectedTile.y }}/{{ selectedTile.z }}
+        </div>
+        <button @click="updateFromChain">
+          <svg-icon type="mdi" :path="mdiRefresh"></svg-icon>
+        </button>
+        <button @click="selectedTile = null">
+          <svg-icon type="mdi" :path="mdiClose"></svg-icon>
+        </button>
       </div>
-      <button @click="updateFromChain">
-        <svg-icon type="mdi" :path="mdiRefresh"></svg-icon>
-      </button>
-      <button @click="selectedTile = null">
-        <svg-icon type="mdi" :path="mdiClose"></svg-icon>
-      </button>
-    </div>
-    <div v-if="selectedTileInfo">
-      <img
-        :src="selectedTileInfo.image"
-        :alt="selectedTileInfo.name"
-        class="rounded"
-      />
-      <button v-if="isOwner && levelPrice" class="w-full" @click="levelUp">
-        Level up for {{ ethers.utils.formatEther(levelPrice) }} ETH
-      </button>
-      <div class="px-3 pt-1 text-lg font-bold text-slate-400">
-        {{ selectedTileInfo.name }} (Lvl {{ selectedTileInfo.level }})
+      <div v-if="selectedTileInfo">
+        <img
+          :src="selectedTileInfo.image"
+          :alt="selectedTileInfo.name"
+          class="rounded"
+        />
+        <button v-if="isOwner && levelPrice" class="w-full" @click="levelUp">
+          Level up for {{ ethers.utils.formatEther(levelPrice) }} ETH
+        </button>
+        <div class="px-3 pt-1 text-lg font-bold text-slate-400">
+          {{ selectedTileInfo.name }} (Lvl {{ selectedTileInfo.level }})
+        </div>
+        <p class="px-3 text-slate-500">{{ selectedTileInfo.description }}</p>
+        <p class="px-3 text-slate-500 truncate mt-3">Owner:<br />{{ tokenOwner }}</p>
       </div>
-      <p class="px-3 text-slate-500">{{ selectedTileInfo.description }}</p>
-    </div>
-    <div v-else>
-      <div
-        class="flex aspect-square w-full items-center justify-center bg-slate-900 text-center text-3xl font-bold text-white text-opacity-30"
-      >
-        ?
+      <div v-else>
+        <div
+          v-if="mintPrice"
+          class="aspect-square bg-sky-900 bg-cover"
+          :style="{
+            backgroundImage: 'url(artwork/base2.jpeg)',
+          }"
+          @click="mintNft"
+        >
+          <div
+            class="grow h-full flex cursor-pointer items-center justify-center animate-pulse bg-gray-50 bg-opacity-30 text-2xl font-bold text-white text-center"
+          >
+            Deploy Base<br />
+            {{ ethers.utils.formatEther(mintPrice) }} ETH
+          </div>
+        </div>
       </div>
-      <button v-if="mintPrice" class="w-full" @click="mintNft">
-        Mint for {{ ethers.utils.formatEther(mintPrice) }} ETH
-      </button>
     </div>
+    <div v-else class="text-center text-sky-700 p-3">select tile</div>
   </div>
 </template>

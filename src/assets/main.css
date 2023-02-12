@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  @apply !outline-none;
+}
+
+body {
+  @apply bg-sky-900 text-white;
+}
+
 button {
-  @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4;
+  @apply bg-sky-900 hover:bg-sky-800 text-white font-bold py-2 px-4;
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }

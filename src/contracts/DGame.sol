@@ -21,10 +21,12 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
   mapping (int256 => mapping(int256 => mapping(int256 => uint256))) public tokenIdsByCoordinate;
   mapping (uint256 => Coordinate) public coordinatesByTokenId;
   mapping (uint256 => uint256) public tokenLevels;
-  uint256 constant COORD_BASE_PRICE = 0.001 ether;
-  uint256 constant LEVEL_BASE_PRICE = 0.001 ether;
+  uint256 constant public COORD_BASE_PRICE = 0.001 ether;
+  uint256 constant public LEVEL_BASE_PRICE = 0.001 ether;
 
-  constructor() ERC721("DGame", "DGAME") {}
+  constructor() ERC721("DGame", "DGAME") {
+    _tokenIdCounter.increment();
+  }
 
   modifier onlyAvailableCoords(int256 x, int256 y, int256 z) {
     require(tokenIdsByCoordinate[x][y][z] == 0, "Coordinate already taken");
@@ -35,6 +37,7 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
   function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
     Coordinate memory coordinate = coordinatesByTokenId[tokenId];
     tokenIdsByCoordinate[coordinate.x][coordinate.y][coordinate.z] = 0;
+    delete coordinatesByTokenId[tokenId];
     super._burn(tokenId);
   }
 

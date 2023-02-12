@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { watchDebounced } from '@vueuse/core'
-import SvgIcon from '@jamescoyle/vue-icon'
-import { mdiLoading } from '@mdi/js'
+import { onMounted, onUnmounted, ref } from "vue";
 import { indexer } from "../state/Gun";
 import { GameMapState, type TileInfo } from "../state/GameMap";
 
@@ -12,42 +9,33 @@ const props = defineProps<{
   z: bigint;
 }>();
 
-const { selectedTile, tilesLoading } = GameMapState();
+const { selectedTile } = GameMapState();
 
-const tileInfo = ref<TileInfo | undefined>(undefined);
-const loading = ref(false);
+const tileInfo = ref<TileInfo | null>(null);
 
-watch(loading, (value) => {
-  if (value) tilesLoading.value++;
-  else tilesLoading.value--;
+onMounted(() => {
+  indexer.get('coords')
+    .get(props.x.toString())
+    .get(props.y.toString())
+    .get(props.z.toString())
+    .on((tokenId) => {
+      if (typeof tokenId !== "string") {
+        tileInfo.value = null;
+        return
+      };
+      indexer.get('tokens').get(tokenId.toString()).once((data) => {
+        tileInfo.value = data;
+      });
+    });
 });
 
-watchDebounced(
-  [
-    () => props.x,
-    () => props.y,
-    () => props.z
-  ],
-  () => {
-    loading.value = true;
-    indexer.get('coords')
-      .get(props.x.toString())
-      .get(props.y.toString())
-      .get(props.z.toString())
-      .once((tokenId) => {
-        if (tokenId === undefined) {
-          tileInfo.value = undefined;
-          loading.value = false;
-          return
-        };
-        indexer.get('tokens').get(tokenId.toString()).once((data) => {
-          tileInfo.value = data;
-          loading.value = false;
-        });
-      });
-  },
-  { debounce: 500, maxWait: 10000, immediate: true },
-);
+onUnmounted(() => {
+  indexer.get('coords')
+    .get(props.x.toString())
+    .get(props.y.toString())
+    .get(props.z.toString())
+    .off();
+});
 </script>
 
 <template>
@@ -56,9 +44,8 @@ watchDebounced(
     :class="{ 'bg-opacity-10 hover:bg-opacity-20': !tileInfo }"
     @click="selectedTile = { x, y, z }"
   >
-    <img v-if="tileInfo && tileInfo.image" :src="tileInfo.image" alt="Tile" />
-    <div v-if="loading" class="absolute inset-0 text-sky-900 font-bold flex items-center justify-center">
-      <svg-icon type="mdi" :path="mdiLoading" class="animate-spin"></svg-icon>
-    </div>
+    <Transition>
+      <img v-if="tileInfo && tileInfo.image" :src="tileInfo.image" alt="Tile" />
+    </Transition>
   </div>
 </template>
