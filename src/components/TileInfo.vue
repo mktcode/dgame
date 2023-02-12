@@ -168,17 +168,22 @@ async function mintNft() {
       .put(tokenId.toString());
   });
 
-  const tx = await contract.safeMint(coords.x, coords.y, coords.z, {
-    value: mintPrice.value,
-  });
-
-  isMinting.value = true;
-  const deployingBaseAudio = new Audio("/sounds/deploying-base.mp3");
-  deployingBaseAudio.play();
-  await tx.wait();
-  const deploymentCompleteAudio = new Audio("/sounds/deployment-complete.mp3");
-  deploymentCompleteAudio.play();
-  isMinting.value = false;
+  try {
+    const tx = await contract.safeMint(coords.x, coords.y, coords.z, {
+      value: mintPrice.value,
+    });
+  
+    isMinting.value = true;
+    const deployingBaseAudio = new Audio("/sounds/deploying-base.mp3");
+    deployingBaseAudio.play();
+    await tx.wait();
+    const deploymentCompleteAudio = new Audio("/sounds/deployment-complete.mp3");
+    deploymentCompleteAudio.play();
+    isMinting.value = false;
+  } catch {
+    const canceledAudio = new Audio("/sounds/canceled.mp3");
+    canceledAudio.play();
+  }
 }
 
 async function levelUp() {
@@ -194,23 +199,28 @@ async function levelUp() {
 
   await provider.send("eth_requestAccounts", []);
 
-  const tx = await contract.levelUp(existingTokenId.value.toString(), {
-    value: levelPrice.value,
-  });
-
-  const upgradingBaseAudio = new Audio("/sounds/upgrading-base.mp3");
-  upgradingBaseAudio.play();
-
-  await tx.wait();
+  try {
+    const tx = await contract.levelUp(existingTokenId.value.toString(), {
+      value: levelPrice.value,
+    });
   
-  const upgradeCompleteAudio = new Audio("/sounds/upgrade-complete.mp3");
-  upgradeCompleteAudio.play();
-
-  indexer
-    .get("tokens")
-    .get(existingTokenId.value.toString())
-    .get("level")
-    .put((selectedTileInfo.value.level + 1n).toString());
+    const upgradingBaseAudio = new Audio("/sounds/upgrading-base.mp3");
+    upgradingBaseAudio.play();
+  
+    await tx.wait();
+  
+    const upgradeCompleteAudio = new Audio("/sounds/upgrade-complete.mp3");
+    upgradeCompleteAudio.play();
+  
+    indexer
+      .get("tokens")
+      .get(existingTokenId.value.toString())
+      .get("level")
+      .put((selectedTileInfo.value.level + 1n).toString());
+  } catch {
+    const canceledAudio = new Audio("/sounds/canceled.mp3");
+    canceledAudio.play();
+  }
 }
 
 async function updateFromChain() {
