@@ -197,7 +197,15 @@ async function levelUp() {
   const tx = await contract.levelUp(existingTokenId.value.toString(), {
     value: levelPrice.value,
   });
+
+  const upgradingBaseAudio = new Audio("/sounds/upgrading-base.mp3");
+  upgradingBaseAudio.play();
+
   await tx.wait();
+  
+  const upgradeCompleteAudio = new Audio("/sounds/upgrade-complete.mp3");
+  upgradeCompleteAudio.play();
+
   indexer
     .get("tokens")
     .get(existingTokenId.value.toString())

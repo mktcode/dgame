@@ -17,6 +17,14 @@ function close() {
   const introAudio = new Audio("/sounds/intro.mp3");
   introAudio.volume = 0.1;
   introAudio.play();
+
+  const ambientAudio = new Audio("/sounds/ambient.mp3");
+  ambientAudio.volume = 0.1;
+  ambientAudio.loop = true;
+  ambientAudio.play();
+  
+  const welcomeAudio = new Audio("/sounds/welcome.mp3");
+  welcomeAudio.play();
 }
 </script>
 
