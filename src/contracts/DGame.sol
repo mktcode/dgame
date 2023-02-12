@@ -4,9 +4,10 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract DGame is ERC721, ERC721URIStorage, ERC721Burnable {
+contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
   using Counters for Counters.Counter;
 
   Counters.Counter private _tokenIdCounter;
@@ -19,6 +20,9 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable {
 
   mapping (int256 => mapping(int256 => mapping(int256 => uint256))) public tokenIdsByCoordinate;
   mapping (uint256 => Coordinate) public coordinatesByTokenId;
+  mapping (uint256 => uint256) public tokenLevels;
+  uint256 constant COORD_BASE_PRICE = 0.001 ether;
+  uint256 constant LEVEL_BASE_PRICE = 0.001 ether;
 
   constructor() ERC721("DGame", "DGAME") {}
 
@@ -44,18 +48,40 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable {
   }
   /** End required overrides */
 
-  function safeMint(int256 x, int256 y, int256 z) public onlyAvailableCoords(x, y, z) {
+  function safeMint(int256 x, int256 y, int256 z) public payable onlyAvailableCoords(x, y, z) {
+    uint256 price = getMintPrice(_msgSender());
+    require(msg.value >= price, "Not enough ETH to mint");
+    payable(owner()).transfer(msg.value);
+
     uint256 tokenId = _tokenIdCounter.current();
     _tokenIdCounter.increment();
 
     tokenIdsByCoordinate[x][y][z] = tokenId;
     coordinatesByTokenId[tokenId] = Coordinate(x, y, z);
     
-    _safeMint(msg.sender, tokenId);
+    _safeMint(_msgSender(), tokenId);
   }
 
   function updateUri(uint256 tokenId, string memory uri) public {
     require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not owner nor approved");
     _setTokenURI(tokenId, uri);
+  }
+
+  function levelUp(uint256 tokenId) public payable {
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not owner nor approved");
+
+    uint256 price = getTokenLevelPrice(tokenId);
+    require(msg.value >= price, "Not enough ETH to level up");
+    payable(owner()).transfer(msg.value);
+    tokenLevels[tokenId] += 1;
+  }
+
+  function getTokenLevelPrice(uint256 tokenId) public view returns (uint256) {
+    return LEVEL_BASE_PRICE * 2 ** tokenLevels[tokenId];
+  }
+
+  function getMintPrice(address owner) public view returns (uint256) {
+    uint256 ownedTokens = balanceOf(owner);
+    return COORD_BASE_PRICE * 2 ** ownedTokens;    
   }
 }
