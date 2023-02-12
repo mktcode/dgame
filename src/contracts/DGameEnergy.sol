@@ -9,6 +9,7 @@ contract DGameEnergy is ERC20, ERC20Burnable {
   DGame public dgame;
 
   mapping(uint256 => uint256) public timers;
+  mapping(uint256 => uint256) public tokenLevels;
 
   constructor(address dgameAddress) ERC20("DGameEnergy", "DGE") {
     dgame = DGame(dgameAddress);
@@ -17,19 +18,20 @@ contract DGameEnergy is ERC20, ERC20Burnable {
   function mint(uint256 tokenId) public {
     require(timers[tokenId] > 0, "Token not activated");
 
-    uint256 tokenLevel = dgame.tokenLevels(tokenId);
     address tokenOwner = dgame.ownerOf(tokenId);
 
     require(tokenOwner != address(0), "Token not owned");
 
-    uint256 amount = (block.timestamp - timers[tokenId]) * tokenLevel;
+    uint256 amount = (block.timestamp - timers[tokenId]) * tokenLevels[tokenId];
     timers[tokenId] = block.timestamp;
+    tokenLevels[tokenId] = dgame.tokenLevels(tokenId);
 
     _mint(tokenOwner, amount);
   }
 
   function activate(uint256 tokenId) public {
-    require(dgame.ownerOf(tokenId) == _msgSender(), "Not the owner of the token");
+    require(timers[tokenId] == 0, "Token already activated");
     timers[tokenId] = block.timestamp;
+    tokenLevels[tokenId] = dgame.tokenLevels(tokenId);
   }
 }
