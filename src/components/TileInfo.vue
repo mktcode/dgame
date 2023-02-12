@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { Contract, ethers } from "ethers";
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiClose, mdiRefresh } from '@mdi/js'
 import { GameMapState, type TileInfo } from "../state/GameMap";
 import DGAME_ABI from "../contracts/DGame.json";
 import { indexer } from "../state/Gun";
@@ -144,15 +146,26 @@ async function levelUp() {
   await tx.wait();
   indexer.get('tokens').get(existingTokenId.value.toString()).get("level").put(selectedTileInfo.value.level + 1n);
 }
+
+async function updateFromChain() {
+  if (!selectedTile.value) return;
+
+  // TODO: Implement
+}
 </script>
 
 <template>
   <div class="grow overflow-y-auto bg-sky-900">
     <div class="flex items-center justify-between">
-      <div v-if="selectedTile" class="p-1 text-lg font-bold text-slate-300">
+      <div v-if="selectedTile" class="p-1 text-lg font-bold text-slate-300 mr-auto">
         {{ selectedTile.x }}/{{ selectedTile.y }}/{{ selectedTile.z }}
       </div>
-      <button @click="selectedTile = null">x</button>
+      <button @click="updateFromChain">
+        <svg-icon type="mdi" :path="mdiRefresh"></svg-icon>
+      </button>
+      <button @click="selectedTile = null">
+        <svg-icon type="mdi" :path="mdiClose"></svg-icon>
+      </button>
     </div>
     <div v-if="selectedTileInfo">
       <img
