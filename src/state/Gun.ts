@@ -10,4 +10,7 @@ const gun = new Gun({
   localStorage: false,
 });
 
-export const indexer = gun.get("dgame").get("1").get(import.meta.env.VITE_DGAME_CONTRACT_ADDRESS);
+export const indexer = gun
+  .get("dgame")
+  .get("1")
+  .get(import.meta.env.VITE_DGAME_CONTRACT_ADDRESS);

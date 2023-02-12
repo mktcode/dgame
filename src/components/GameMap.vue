@@ -3,11 +3,7 @@ import { computed } from "vue";
 import Tile from "./Tile.vue";
 import { Direction, GameMapState } from "../state/GameMap";
 
-const {
-  gameMap,
-  position,
-  move,
-} = GameMapState();
+const { gameMap, position, move } = GameMapState();
 
 const visibleTilesX = computed(() => {
   const tiles = [];
@@ -48,7 +44,11 @@ const visibleTilesY = computed(() => {
     @keyup.shift.down="move(Direction.Backward)"
     @keyup.shift.up="move(Direction.Forward)"
   >
-    <div v-for="y in visibleTilesY" :key="`y-${y.toString()}`" class="flex space-x-1">
+    <div
+      v-for="y in visibleTilesY"
+      :key="`y-${y.toString()}`"
+      class="flex space-x-1"
+    >
       <Tile
         v-for="x in visibleTilesX"
         :key="`${x}-${y}-${position.z.toString()}`"

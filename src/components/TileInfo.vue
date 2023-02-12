@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { Contract, ethers } from "ethers";
-import SvgIcon from '@jamescoyle/vue-icon'
-import { mdiClose, mdiRefresh } from '@mdi/js'
+import SvgIcon from "@jamescoyle/vue-icon";
+import { mdiClose, mdiRefresh } from "@mdi/js";
 import { GameMapState, type TileInfo } from "../state/GameMap";
 import DGAME_ABI from "../contracts/DGame.json";
 import { indexer } from "../state/Gun";
@@ -44,14 +44,16 @@ async function getLevelPriceForToken() {
     return;
   }
 
-  levelPrice.value = await contract.getTokenLevelPrice(existingTokenId.value.toString());
+  levelPrice.value = await contract.getTokenLevelPrice(
+    existingTokenId.value.toString()
+  );
 }
 
 async function getIsOwner() {
   if (existingTokenId.value === null) {
     isOwner.value = false;
     return;
-  };
+  }
 
   if (window.ethereum == null) {
     console.log("MetaMask not installed.");
@@ -60,40 +62,54 @@ async function getIsOwner() {
   }
 
   const accounts = await provider.send("eth_requestAccounts", []);
-  tokenOwner.value = await contract.ownerOf(existingTokenId.value.toString()) as string;
+  tokenOwner.value = (await contract.ownerOf(
+    existingTokenId.value.toString()
+  )) as string;
   isOwner.value = tokenOwner.value.toLowerCase() === accounts[0].toLowerCase();
 }
 
-watch(selectedTile, () => {
-  if (!selectedTile.value) return null;
+watch(
+  selectedTile,
+  () => {
+    if (!selectedTile.value) return null;
 
-  getMintPriceForAccount();
+    getMintPriceForAccount();
 
-  const coords = {
-    x: selectedTile.value.x.toString(),
-    y: selectedTile.value.y.toString(),
-    z: selectedTile.value.z.toString(),
-  };
+    const coords = {
+      x: selectedTile.value.x.toString(),
+      y: selectedTile.value.y.toString(),
+      z: selectedTile.value.z.toString(),
+    };
 
-  indexer.get('coords').get(coords.x).get(coords.y).get(coords.z).once((tokenId) => {
-    existingTokenId.value = tokenId ? BigInt(tokenId) : null;
+    indexer
+      .get("coords")
+      .get(coords.x)
+      .get(coords.y)
+      .get(coords.z)
+      .once((tokenId) => {
+        existingTokenId.value = tokenId ? BigInt(tokenId) : null;
 
-    getIsOwner();
-    getLevelPriceForToken();
+        getIsOwner();
+        getLevelPriceForToken();
 
-    if (typeof tokenId !== "string") {
-      selectedTileInfo.value = null;
-      return;
-    }
-    
-    indexer.get('tokens').get(tokenId.toString()).once((data) => {
-      if (data && data.level.length > 0) {
-        data.level = BigInt(data.level);
-      }
-      selectedTileInfo.value = data;
-    });
-  });
-}, { immediate: true });
+        if (typeof tokenId !== "string") {
+          selectedTileInfo.value = null;
+          return;
+        }
+
+        indexer
+          .get("tokens")
+          .get(tokenId.toString())
+          .once((data) => {
+            if (data && data.level.length > 0) {
+              data.level = BigInt(data.level);
+            }
+            selectedTileInfo.value = data;
+          });
+      });
+  },
+  { immediate: true }
+);
 
 async function mintNft() {
   if (!selectedTile.value) return;
@@ -117,12 +133,25 @@ async function mintNft() {
 
     event.removeListener();
 
-    indexer.get('tokens').get(tokenId.toString()).get("level").put('1');
-    indexer.get('tokens').get(tokenId.toString()).get("type").put("base");
-    indexer.get('tokens').get(tokenId.toString()).get("name").put("Base");
-    indexer.get('tokens').get(tokenId.toString()).get("description").put("A player's base");
-    indexer.get('tokens').get(tokenId.toString()).get("image").put("artwork/base2.jpeg");
-    indexer.get('coords').get(coords.x).get(coords.y).get(coords.z).put(tokenId.toString());
+    indexer.get("tokens").get(tokenId.toString()).get("level").put("1");
+    indexer.get("tokens").get(tokenId.toString()).get("type").put("base");
+    indexer.get("tokens").get(tokenId.toString()).get("name").put("Base");
+    indexer
+      .get("tokens")
+      .get(tokenId.toString())
+      .get("description")
+      .put("A player's base");
+    indexer
+      .get("tokens")
+      .get(tokenId.toString())
+      .get("image")
+      .put("artwork/base2.jpeg");
+    indexer
+      .get("coords")
+      .get(coords.x)
+      .get(coords.y)
+      .get(coords.z)
+      .put(tokenId.toString());
   });
 
   const tx = await contract.safeMint(coords.x, coords.y, coords.z, {
@@ -148,7 +177,11 @@ async function levelUp() {
     value: levelPrice.value,
   });
   await tx.wait();
-  indexer.get('tokens').get(existingTokenId.value.toString()).get("level").put((selectedTileInfo.value.level + 1n).toString());
+  indexer
+    .get("tokens")
+    .get(existingTokenId.value.toString())
+    .get("level")
+    .put((selectedTileInfo.value.level + 1n).toString());
 }
 
 async function updateFromChain() {
@@ -165,11 +198,15 @@ async function updateFromChain() {
     z: selectedTile.value.z.toString(),
   };
 
-  const tokenId = await contract.tokenIdsByCoordinate(coords.x, coords.y, coords.z);
-  
+  const tokenId = await contract.tokenIdsByCoordinate(
+    coords.x,
+    coords.y,
+    coords.z
+  );
+
   if (tokenId.eq(0)) {
     selectedTileInfo.value = null;
-    indexer.get('coords').get(coords.x).get(coords.y).get(coords.z).put(null);
+    indexer.get("coords").get(coords.x).get(coords.y).get(coords.z).put(null);
   } else {
     // const tokenUri = await contract.tokenURI(tokenId);
     // const response = await fetch(tokenUri);
@@ -177,18 +214,43 @@ async function updateFromChain() {
 
     const tileInfo: TileInfo = {
       level: await contract.tokenLevels(tokenId),
-      type: 'base',
-      name: 'Base',
-      description: 'A player\'s base.',
-      image: 'artwork/base2.jpeg',
+      type: "base",
+      name: "Base",
+      description: "A player's base.",
+      image: "artwork/base2.jpeg",
     };
 
-    indexer.get('tokens').get(tokenId.toString()).get("level").put(tileInfo.level.toString());
-    indexer.get('tokens').get(tokenId.toString()).get("type").put(tileInfo.type);
-    indexer.get('tokens').get(tokenId.toString()).get("name").put(tileInfo.name);
-    indexer.get('tokens').get(tokenId.toString()).get("description").put(tileInfo.description);
-    indexer.get('tokens').get(tokenId.toString()).get("image").put(tileInfo.image);
-    indexer.get('coords').get(coords.x).get(coords.y).get(coords.z).put(tokenId.toString());
+    indexer
+      .get("tokens")
+      .get(tokenId.toString())
+      .get("level")
+      .put(tileInfo.level.toString());
+    indexer
+      .get("tokens")
+      .get(tokenId.toString())
+      .get("type")
+      .put(tileInfo.type);
+    indexer
+      .get("tokens")
+      .get(tokenId.toString())
+      .get("name")
+      .put(tileInfo.name);
+    indexer
+      .get("tokens")
+      .get(tokenId.toString())
+      .get("description")
+      .put(tileInfo.description);
+    indexer
+      .get("tokens")
+      .get(tokenId.toString())
+      .get("image")
+      .put(tileInfo.image);
+    indexer
+      .get("coords")
+      .get(coords.x)
+      .get(coords.y)
+      .get(coords.z)
+      .put(tokenId.toString());
   }
 }
 </script>
@@ -197,7 +259,7 @@ async function updateFromChain() {
   <div class="grow overflow-y-auto bg-sky-900">
     <div v-if="selectedTile">
       <div class="flex items-center justify-between">
-        <div class="p-1 text-lg font-bold text-slate-300 mr-auto">
+        <div class="mr-auto p-1 text-lg font-bold text-slate-300">
           {{ selectedTile.x }}/{{ selectedTile.y }}/{{ selectedTile.z }}
         </div>
         <button @click="updateFromChain">
@@ -220,7 +282,9 @@ async function updateFromChain() {
           {{ selectedTileInfo.name }} (Lvl {{ selectedTileInfo.level }})
         </div>
         <p class="px-3 text-slate-500">{{ selectedTileInfo.description }}</p>
-        <p class="px-3 text-slate-500 truncate mt-3">Owner:<br />{{ tokenOwner }}</p>
+        <p class="mt-3 truncate px-3 text-slate-500">
+          Owner:<br />{{ tokenOwner }}
+        </p>
       </div>
       <div v-else>
         <div
@@ -232,7 +296,7 @@ async function updateFromChain() {
           @click="mintNft"
         >
           <div
-            class="grow h-full flex cursor-pointer items-center justify-center animate-pulse bg-gray-50 bg-opacity-30 text-2xl font-bold text-white text-center"
+            class="flex h-full grow animate-pulse cursor-pointer items-center justify-center bg-gray-50 bg-opacity-30 text-center text-2xl font-bold text-white"
           >
             Deploy Base<br />
             {{ ethers.utils.formatEther(mintPrice) }} ETH
@@ -240,6 +304,6 @@ async function updateFromChain() {
         </div>
       </div>
     </div>
-    <div v-else class="text-center text-sky-700 p-3">select tile</div>
+    <div v-else class="p-3 text-center text-sky-700">select tile</div>
   </div>
 </template>
