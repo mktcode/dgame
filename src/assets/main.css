@@ -11,7 +11,7 @@ body {
 }
 
 button {
-  @apply bg-sky-900 hover:bg-sky-800 text-white font-bold py-2 px-4;
+  @apply bg-sky-800 hover:bg-sky-700 text-white font-bold py-2 px-4;
 }
 
 .v-enter-active,
@@ -21,5 +21,15 @@ button {
 
 .v-enter-from,
 .v-leave-to {
+  opacity: 0;
+}
+
+.fade-fast-enter-active,
+.fade-fast-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.fade-fast-enter-from,
+.fade-fast-leave-to {
   opacity: 0;
 }

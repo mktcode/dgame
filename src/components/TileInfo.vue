@@ -22,6 +22,7 @@ const selectedTileInfo = ref<TileInfo | null>(null);
 
 const existingTokenId = ref<bigint | null>(null);
 const mintPrice = ref<bigint | null>(null);
+const isMinting = ref(false);
 const levelPrice = ref<bigint | null>(null);
 const tokenOwner = ref<string | null>(null);
 const isOwner = ref(false);
@@ -70,15 +71,28 @@ async function getIsOwner() {
 
 watch(
   selectedTile,
-  () => {
-    if (!selectedTile.value) return null;
-
+  (newValue, oldValue) => {
     getMintPriceForAccount();
+    
+    if (oldValue) {
+      indexer
+      .get("coords")
+      .get(oldValue.x.toString())
+      .get(oldValue.y.toString())
+      .get(oldValue.z.toString())
+      .off();
+    }
+    
+    selectedTileInfo.value = null;
+    
+    if (!newValue) {
+      return;
+    };
 
     const coords = {
-      x: selectedTile.value.x.toString(),
-      y: selectedTile.value.y.toString(),
-      z: selectedTile.value.z.toString(),
+      x: newValue.x.toString(),
+      y: newValue.y.toString(),
+      z: newValue.z.toString(),
     };
 
     indexer
@@ -86,13 +100,13 @@ watch(
       .get(coords.x)
       .get(coords.y)
       .get(coords.z)
-      .once((tokenId) => {
+      .on((tokenId) => {
         existingTokenId.value = tokenId ? BigInt(tokenId) : null;
 
         getIsOwner();
         getLevelPriceForToken();
 
-        if (typeof tokenId !== "string") {
+        if (typeof tokenId !== "string" || tokenId === "0") {
           selectedTileInfo.value = null;
           return;
         }
@@ -157,7 +171,14 @@ async function mintNft() {
   const tx = await contract.safeMint(coords.x, coords.y, coords.z, {
     value: mintPrice.value,
   });
+
+  isMinting.value = true;
+  const deployingBaseAudio = new Audio("/sounds/deploying-base.mp3");
+  deployingBaseAudio.play();
   await tx.wait();
+  const deploymentCompleteAudio = new Audio("/sounds/deployment-complete.mp3");
+  deploymentCompleteAudio.play();
+  isMinting.value = false;
 }
 
 async function levelUp() {
@@ -269,40 +290,47 @@ async function updateFromChain() {
           <svg-icon type="mdi" :path="mdiClose"></svg-icon>
         </button>
       </div>
-      <div v-if="selectedTileInfo">
-        <img
-          :src="selectedTileInfo.image"
-          :alt="selectedTileInfo.name"
-          class="rounded"
-        />
-        <button v-if="isOwner && levelPrice" class="w-full" @click="levelUp">
-          Level up for {{ ethers.utils.formatEther(levelPrice) }} ETH
-        </button>
-        <div class="px-3 pt-1 text-lg font-bold text-slate-400">
-          {{ selectedTileInfo.name }} (Lvl {{ selectedTileInfo.level }})
+      <Transition name="fade-fast" mode="out-in">
+        <div v-if="selectedTileInfo">
+          <img
+            :src="selectedTileInfo.image"
+            :alt="selectedTileInfo.name"
+            class="rounded"
+          />
+          <button v-if="isOwner && levelPrice" class="w-full" @click="levelUp">
+            Level up for {{ ethers.utils.formatEther(levelPrice) }} ETH
+          </button>
+          <div class="px-3 pt-1 text-lg font-bold text-slate-400">
+            {{ selectedTileInfo.name }} (Lvl {{ selectedTileInfo.level }})
+          </div>
+          <p class="px-3 text-slate-500">{{ selectedTileInfo.description }}</p>
+          <p class="mt-3 truncate px-3 text-slate-500">
+            Owner:<br />{{ tokenOwner }}
+          </p>
         </div>
-        <p class="px-3 text-slate-500">{{ selectedTileInfo.description }}</p>
-        <p class="mt-3 truncate px-3 text-slate-500">
-          Owner:<br />{{ tokenOwner }}
-        </p>
-      </div>
-      <div v-else>
-        <div
-          v-if="mintPrice"
-          class="aspect-square bg-sky-900 bg-cover"
-          :style="{
-            backgroundImage: 'url(artwork/base2.jpeg)',
-          }"
-          @click="mintNft"
-        >
+        <div v-else>
           <div
-            class="flex h-full grow animate-pulse cursor-pointer items-center justify-center bg-gray-50 bg-opacity-30 text-center text-2xl font-bold text-white"
+            v-if="mintPrice"
+            class="aspect-square bg-sky-900 bg-cover"
+            :style="{
+              backgroundImage: 'url(artwork/base2.jpeg)',
+            }"
+            @click="mintNft"
           >
-            Deploy Base<br />
-            {{ ethers.utils.formatEther(mintPrice) }} ETH
+            <div
+              class="flex h-full grow animate-pulse cursor-pointer items-center justify-center bg-gray-50 bg-opacity-30 text-center text-2xl font-bold text-white"
+            >
+              <div v-if="isMinting">
+                deploying...
+              </div>
+              <div v-else>
+                Deploy Base<br />
+                {{ ethers.utils.formatEther(mintPrice) }} ETH
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </Transition>
     </div>
     <div v-else class="p-3 text-center text-sky-700">select tile</div>
   </div>

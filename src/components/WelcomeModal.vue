@@ -13,6 +13,10 @@ defineEmits<{
 function close() {
   isOpen.value = false;
   gameMap.value?.focus();
+
+  const introAudio = new Audio("/sounds/intro.mp3");
+  introAudio.volume = 0.1;
+  introAudio.play();
 }
 </script>
 
