@@ -1,17 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import Tile from "./Tile.vue";
-import { GameMapState } from "../state/GameMap";
+import { Direction, GameMapState } from "../state/GameMap";
 
 const {
   gameMap,
   position,
-  moveLeft,
-  moveRight,
-  moveUp,
-  moveDown,
-  moveForward,
-  moveBackward,
+  move,
 } = GameMapState();
 
 const visibleTilesX = computed(() => {
@@ -46,12 +41,12 @@ const visibleTilesY = computed(() => {
       backgroundSize: position.z * 2n + 300n + '%',
     }"
     tabindex="1"
-    @keyup.left="moveLeft"
-    @keyup.right="moveRight"
-    @keyup.up.exact="moveUp"
-    @keyup.down.exact="moveDown"
-    @keyup.shift.down="moveBackward"
-    @keyup.shift.up="moveForward"
+    @keyup.left="move(Direction.Left)"
+    @keyup.right="move(Direction.Right)"
+    @keyup.up.exact="move(Direction.Up)"
+    @keyup.down.exact="move(Direction.Down)"
+    @keyup.shift.down="move(Direction.Backward)"
+    @keyup.shift.up="move(Direction.Forward)"
   >
     <div v-for="y in visibleTilesY" :key="`y-${y.toString()}`" class="flex space-x-1">
       <Tile

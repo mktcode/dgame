@@ -6,14 +6,14 @@ import GameMap from "./components/GameMap.vue";
 import TileInfo from "./components/TileInfo.vue";
 import { GameMapState } from "./state/GameMap";
 
-const { selectedTile, position } = GameMapState();
+const { selectedTile, position, tilesLoading } = GameMapState();
 </script>
 
 <template>
   <div class="flex h-screen">
     <GameMap />
     <div class="flex w-60 flex-none flex-col">
-      {{ position.x.toString() }} {{ position.y.toString() }} {{ position.z.toString() }}
+      x: {{ position.x.toString() }} y: {{ position.y.toString() }} z: {{ position.z.toString() }}, loading: {{ tilesLoading }}
       <ResourcesInfo />
       <TileInfo v-if="selectedTile" />
       <BuildMenu v-else />
