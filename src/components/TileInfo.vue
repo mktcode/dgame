@@ -9,7 +9,8 @@ import { useWeb3Account, IS_ETHEREUM_ENABLED } from "../state/useWeb3Account";
 import { playAudio } from "@/lib/audio";
 import { useDGameContract } from "@/state/useDGameContract";
 
-const { accountAddress, accountBalance, connect } = useWeb3Account();
+const { accountAddress, accountBalance, connect, shortenAddress } =
+  useWeb3Account();
 const { selectedTile, getTokenLevelPrice, getMintPriceForAccount } =
   GameMapState();
 
@@ -148,7 +149,7 @@ async function levelUp() {
 
     playAudio("upgrade-complete");
 
-    const newTokenLevel = dgameContract.tokenLevels(
+    const newTokenLevel = await dgameContract.tokenLevels(
       existingTokenId.value.toString()
     );
 
@@ -189,7 +190,7 @@ async function updateFromChain() {
     indexer.get("coords").get(coords.x).get(coords.y).get(coords.z).put(null);
   } else {
     const tileInfo: TileInfo = {
-      owner: await dgameContract.ownerOf(tokenId),
+      owner: (await dgameContract.ownerOf(tokenId)).toLowerCase(),
       level: await dgameContract.tokenLevels(tokenId),
       type: "base",
       name: "Base",
@@ -279,11 +280,12 @@ async function updateFromChain() {
           </div>
           <p class="px-3 text-slate-500">{{ selectedTileInfo.description }}</p>
           <p class="mt-3 truncate px-3 text-slate-500">
-            Owner:<br />{{ selectedTileInfo.owner }}
+            Owner: {{ shortenAddress(selectedTileInfo.owner) }}
           </p>
         </div>
         <div v-else>
           <div
+            v-if="IS_ETHEREUM_ENABLED"
             class="aspect-square bg-sky-900 bg-cover"
             :style="{
               backgroundImage: 'url(artwork/base2.jpeg)',
@@ -294,14 +296,24 @@ async function updateFromChain() {
               class="flex h-full grow animate-pulse cursor-pointer items-center justify-center bg-gray-50 bg-opacity-30 text-center text-2xl font-bold text-white"
             >
               <div v-if="isMinting">deploying...</div>
-              <div v-else-if="IS_ETHEREUM_ENABLED">
+              <div v-else>
                 Deploy Base<br />
                 {{ formatEther(getMintPriceForAccount(accountBalance)) }} ETH
               </div>
-              <div v-else class="text-3xl">
-                No Ethereum detected.<br />
-                Please install MetaMask.
-              </div>
+            </div>
+          </div>
+          <div
+            v-else
+            class="aspect-square bg-sky-900 bg-cover"
+            :style="{
+              backgroundImage: 'url(artwork/base2.jpeg)',
+            }"
+          >
+            <div
+              class="flex h-full grow animate-pulse cursor-pointer items-center justify-center bg-red-500 bg-opacity-30 text-center text-3xl font-bold text-white"
+            >
+              No Ethereum detected.<br />
+              Please install MetaMask.
             </div>
           </div>
         </div>

@@ -4,10 +4,10 @@ import WelcomeModal from "./components/WelcomeModal.vue";
 import GameMap from "./components/GameMap.vue";
 import TileInfo from "./components/TileInfo.vue";
 import { GameMapState } from "./state/GameMap";
-import { useWeb3Account } from "./state/useWeb3Account";
+import { IS_ETHEREUM_ENABLED, useWeb3Account } from "./state/useWeb3Account";
 
 const { position } = GameMapState();
-const { accountAddress, connect } = useWeb3Account();
+const { accountAddress, connect, shortenAddress } = useWeb3Account();
 </script>
 
 <template>
@@ -15,9 +15,9 @@ const { accountAddress, connect } = useWeb3Account();
     <GameMap />
     <div class="flex w-72 flex-none flex-col">
       <div v-if="accountAddress" class="py-1 text-center text-sky-700">
-        Acc: {{ accountAddress }}
+        {{ shortenAddress(accountAddress) }}
       </div>
-      <button v-else @click="connect">
+      <button v-else-if="IS_ETHEREUM_ENABLED" @click="connect">
         Connect Wallet
       </button>
       <div class="py-1 text-center text-sky-700">

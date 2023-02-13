@@ -14,7 +14,7 @@ const accountBalance = ref(0n);
 async function connect() {
   if (provider) {
     const account = await provider.getSigner();
-    accountAddress.value = await account.getAddress();
+    accountAddress.value = (await account.getAddress()).toLowerCase();
 
     const { dgameContract } = await useDGameContract(account);
     accountBalance.value = await dgameContract.balanceOf(accountAddress.value);
@@ -29,10 +29,15 @@ async function connect() {
   }
 }
 
+function shortenAddress(address: string) {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
 export function useWeb3Account() {
   return {
     accountAddress,
     accountBalance,
     connect,
+    shortenAddress,
   };
 }
