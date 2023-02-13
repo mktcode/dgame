@@ -45,7 +45,7 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="relative flex aspect-square w-28 min-w-[3.5rem] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-sky-900 text-sm transition-all"
+    class="relative flex aspect-square w-40 min-w-[6rem] cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-sky-900 text-sm transition-all"
     :class="{ 'bg-opacity-10 hover:bg-opacity-20': !tileInfo }"
     @click="selectedTile = { x, y, z }"
   >

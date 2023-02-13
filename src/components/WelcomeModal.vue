@@ -24,7 +24,7 @@ function close() {
   ambientAudio.play();
   
   const welcomeAudio = new Audio("/sounds/welcome.mp3");
-  welcomeAudio.play();
+  setTimeout(() => welcomeAudio.play(), 2000);
 }
 </script>
 

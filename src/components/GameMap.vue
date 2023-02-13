@@ -8,7 +8,7 @@ const { gameMap, position, move } = GameMapState();
 const visibleTilesX = computed(() => {
   const tiles = [];
 
-  for (let i = position.value.x; i < position.value.x + 15n; i++) {
+  for (let i = position.value.x; i < position.value.x + 10n; i++) {
     tiles.push(i);
   }
 
@@ -18,7 +18,7 @@ const visibleTilesX = computed(() => {
 const visibleTilesY = computed(() => {
   const tiles = [];
 
-  for (let i = position.value.y; i < position.value.y + 15n; i++) {
+  for (let i = position.value.y; i < position.value.y + 10n; i++) {
     tiles.push(i);
   }
 

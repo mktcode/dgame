@@ -11,7 +11,7 @@ const { position } = GameMapState();
 <template>
   <div class="flex h-screen">
     <GameMap />
-    <div class="flex w-60 flex-none flex-col">
+    <div class="flex w-72 flex-none flex-col">
       <div class="py-1 text-center text-sky-700">
         x: {{ position.x.toString() }} y: {{ position.y.toString() }} z:
         {{ position.z.toString() }}
