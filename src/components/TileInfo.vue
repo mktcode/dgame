@@ -1,94 +1,39 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { Contract, ethers } from "ethers";
+import { formatEther } from "ethers";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiClose, mdiRefresh } from "@mdi/js";
 import { GameMapState, type TileInfo } from "../state/GameMap";
-import DGAME_ABI from "../contracts/DGame.json";
 import { indexer } from "../state/Gun";
+import { useWeb3Account, IS_ETHEREUM_ENABLED } from "../state/useWeb3Account";
 import { playAudio } from "@/lib/audio";
+import { useDGameContract } from "@/state/useDGameContract";
 
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
-
-const contract = new Contract(
-  import.meta.env.VITE_DGAME_CONTRACT_ADDRESS,
-  DGAME_ABI,
-  signer
-);
-
-const { selectedTile } = GameMapState();
+const { accountAddress, accountBalance, connect } = useWeb3Account();
+const { selectedTile, getTokenLevelPrice, getMintPriceForAccount } =
+  GameMapState();
 
 const selectedTileInfo = ref<TileInfo | null>(null);
-
 const existingTokenId = ref<bigint | null>(null);
-const mintPrice = ref<bigint | null>(null);
 const isMinting = ref(false);
-const levelPrice = ref<bigint | null>(null);
-const tokenOwner = ref<string | null>(null);
-const isOwner = ref(false);
-
-async function getMintPriceForAccount() {
-  if (window.ethereum == null) {
-    console.log("MetaMask not installed.");
-    return;
-  }
-
-  const accounts = await provider.send("eth_requestAccounts", []);
-  mintPrice.value = await contract.getMintPrice(accounts[0]);
-}
-
-async function getLevelPriceForToken() {
-  if (existingTokenId.value === null) return null;
-
-  if (window.ethereum == null) {
-    console.log("MetaMask not installed.");
-    return;
-  }
-
-  levelPrice.value = await contract.getTokenLevelPrice(
-    existingTokenId.value.toString()
-  );
-}
-
-async function getIsOwner() {
-  if (existingTokenId.value === null) {
-    isOwner.value = false;
-    return;
-  }
-
-  if (window.ethereum == null) {
-    console.log("MetaMask not installed.");
-    isOwner.value = false;
-    return;
-  }
-
-  const accounts = await provider.send("eth_requestAccounts", []);
-  tokenOwner.value = (await contract.ownerOf(
-    existingTokenId.value.toString()
-  )) as string;
-  isOwner.value = tokenOwner.value.toLowerCase() === accounts[0].toLowerCase();
-}
 
 watch(
   selectedTile,
   (newValue, oldValue) => {
-    getMintPriceForAccount();
-    
     if (oldValue) {
       indexer
-      .get("coords")
-      .get(oldValue.x.toString())
-      .get(oldValue.y.toString())
-      .get(oldValue.z.toString())
-      .off();
+        .get("coords")
+        .get(oldValue.x.toString())
+        .get(oldValue.y.toString())
+        .get(oldValue.z.toString())
+        .off();
     }
-    
+
     selectedTileInfo.value = null;
-    
+
     if (!newValue) {
       return;
-    };
+    }
 
     const coords = {
       x: newValue.x.toString(),
@@ -103,9 +48,6 @@ watch(
       .get(coords.z)
       .on((tokenId) => {
         existingTokenId.value = tokenId ? BigInt(tokenId) : null;
-
-        getIsOwner();
-        getLevelPriceForToken();
 
         if (typeof tokenId !== "string" || tokenId === "0") {
           selectedTileInfo.value = null;
@@ -128,14 +70,9 @@ watch(
 
 async function mintNft() {
   if (!selectedTile.value) return;
-  if (!mintPrice.value) return;
 
-  if (window.ethereum == null) {
-    console.log("MetaMask not installed.");
-    return;
-  }
-
-  await provider.send("eth_requestAccounts", []);
+  const { account, accountAddress } = await connect();
+  const { dgameContract } = await useDGameContract(account);
 
   const coords = {
     x: selectedTile.value.x.toString(),
@@ -143,11 +80,19 @@ async function mintNft() {
     z: selectedTile.value.z.toString(),
   };
 
-  contract.on("Transfer", (_from, to, tokenId, event) => {
+  dgameContract.on("Transfer", async (_from, to, tokenId, event) => {
     console.log(`Minted NFT ${tokenId} to ${to}`);
 
     event.removeListener();
 
+    const ownerBalance = await dgameContract.balanceOf(accountAddress);
+
+    indexer.get("balances").get(accountAddress).put(ownerBalance.toString());
+    indexer
+      .get("tokens")
+      .get(tokenId.toString())
+      .get("owner")
+      .put(accountAddress);
     indexer.get("tokens").get(tokenId.toString()).get("level").put("1");
     indexer.get("tokens").get(tokenId.toString()).get("type").put("base");
     indexer.get("tokens").get(tokenId.toString()).get("name").put("Base");
@@ -170,8 +115,8 @@ async function mintNft() {
   });
 
   try {
-    const tx = await contract.safeMint(coords.x, coords.y, coords.z, {
-      value: mintPrice.value,
+    const tx = await dgameContract.safeMint(coords.x, coords.y, coords.z, {
+      value: getMintPriceForAccount(accountBalance.value),
     });
 
     isMinting.value = true;
@@ -179,7 +124,7 @@ async function mintNft() {
     await tx.wait();
     playAudio("deployment-complete");
     isMinting.value = false;
-  } catch {
+  } catch (e) {
     playAudio("canceled");
   }
 }
@@ -187,19 +132,14 @@ async function mintNft() {
 async function levelUp() {
   if (!selectedTile.value) return;
   if (!selectedTileInfo.value) return;
-  if (!levelPrice.value) return;
   if (existingTokenId.value === null) return;
 
-  if (window.ethereum == null) {
-    console.log("MetaMask not installed.");
-    return;
-  }
-
-  await provider.send("eth_requestAccounts", []);
+  const { account } = await connect();
+  const { dgameContract } = await useDGameContract(account);
 
   try {
-    const tx = await contract.levelUp(existingTokenId.value.toString(), {
-      value: levelPrice.value,
+    const tx = await dgameContract.levelUp(existingTokenId.value.toString(), {
+      value: getTokenLevelPrice(selectedTileInfo.value.level),
     });
 
     playAudio("upgrading-base");
@@ -208,23 +148,29 @@ async function levelUp() {
 
     playAudio("upgrade-complete");
 
+    const newTokenLevel = dgameContract.tokenLevels(
+      existingTokenId.value.toString()
+    );
+
     indexer
       .get("tokens")
       .get(existingTokenId.value.toString())
       .get("level")
-      .put((selectedTileInfo.value.level + 1n).toString());
+      .put(newTokenLevel.toString());
   } catch {
     playAudio("canceled");
   }
 }
 
+const isUpdatingFromChain = ref(false);
+
 async function updateFromChain() {
   if (!selectedTile.value) return;
 
-  if (window.ethereum == null) {
-    console.log("MetaMask not installed.");
-    return;
-  }
+  isUpdatingFromChain.value = true;
+
+  const { account } = await connect();
+  const { dgameContract } = await useDGameContract(account);
 
   const coords = {
     x: selectedTile.value.x.toString(),
@@ -232,28 +178,32 @@ async function updateFromChain() {
     z: selectedTile.value.z.toString(),
   };
 
-  const tokenId = await contract.tokenIdsByCoordinate(
+  const tokenId = await dgameContract.tokenIdsByCoordinate(
     coords.x,
     coords.y,
     coords.z
   );
 
-  if (tokenId.eq(0)) {
+  if (tokenId === 0n) {
     selectedTileInfo.value = null;
     indexer.get("coords").get(coords.x).get(coords.y).get(coords.z).put(null);
   } else {
-    // const tokenUri = await contract.tokenURI(tokenId);
-    // const response = await fetch(tokenUri);
-    // const json = await response.json();
-
     const tileInfo: TileInfo = {
-      level: await contract.tokenLevels(tokenId),
+      owner: await dgameContract.ownerOf(tokenId),
+      level: await dgameContract.tokenLevels(tokenId),
       type: "base",
       name: "Base",
       description: "A player's base.",
       image: "artwork/base2.jpeg",
     };
 
+    selectedTileInfo.value = tileInfo;
+
+    indexer
+      .get("tokens")
+      .get(tokenId.toString())
+      .get("owner")
+      .put(tileInfo.owner);
     indexer
       .get("tokens")
       .get(tokenId.toString())
@@ -285,6 +235,8 @@ async function updateFromChain() {
       .get(coords.y)
       .get(coords.z)
       .put(tokenId.toString());
+
+    isUpdatingFromChain.value = false;
   }
 }
 </script>
@@ -296,8 +248,12 @@ async function updateFromChain() {
         <div class="mr-auto p-1 text-lg font-bold text-slate-300">
           {{ selectedTile.x }}/{{ selectedTile.y }}/{{ selectedTile.z }}
         </div>
-        <button @click="updateFromChain">
-          <svg-icon type="mdi" :path="mdiRefresh"></svg-icon>
+        <button v-if="IS_ETHEREUM_ENABLED" @click="updateFromChain">
+          <svg-icon
+            type="mdi"
+            :path="mdiRefresh"
+            :class="{ 'animate-spin': isUpdatingFromChain }"
+          ></svg-icon>
         </button>
         <button @click="selectedTile = null">
           <svg-icon type="mdi" :path="mdiClose"></svg-icon>
@@ -310,20 +266,24 @@ async function updateFromChain() {
             :alt="selectedTileInfo.name"
             class="rounded"
           />
-          <button v-if="isOwner && levelPrice" class="w-full" @click="levelUp">
-            Level up for {{ ethers.utils.formatEther(levelPrice) }} ETH
+          <button
+            v-if="selectedTileInfo.owner === accountAddress"
+            class="w-full"
+            @click="levelUp"
+          >
+            Level up for
+            {{ formatEther(getTokenLevelPrice(selectedTileInfo.level)) }} ETH
           </button>
           <div class="px-3 pt-1 text-lg font-bold text-slate-400">
             {{ selectedTileInfo.name }} (Lvl {{ selectedTileInfo.level }})
           </div>
           <p class="px-3 text-slate-500">{{ selectedTileInfo.description }}</p>
           <p class="mt-3 truncate px-3 text-slate-500">
-            Owner:<br />{{ tokenOwner }}
+            Owner:<br />{{ selectedTileInfo.owner }}
           </p>
         </div>
         <div v-else>
           <div
-            v-if="mintPrice"
             class="aspect-square bg-sky-900 bg-cover"
             :style="{
               backgroundImage: 'url(artwork/base2.jpeg)',
@@ -333,12 +293,14 @@ async function updateFromChain() {
             <div
               class="flex h-full grow animate-pulse cursor-pointer items-center justify-center bg-gray-50 bg-opacity-30 text-center text-2xl font-bold text-white"
             >
-              <div v-if="isMinting">
-                deploying...
-              </div>
-              <div v-else>
+              <div v-if="isMinting">deploying...</div>
+              <div v-else-if="IS_ETHEREUM_ENABLED">
                 Deploy Base<br />
-                {{ ethers.utils.formatEther(mintPrice) }} ETH
+                {{ formatEther(getMintPriceForAccount(accountBalance)) }} ETH
+              </div>
+              <div v-else class="text-3xl">
+                No Ethereum detected.<br />
+                Please install MetaMask.
               </div>
             </div>
           </div>

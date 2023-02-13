@@ -1,16 +1,14 @@
+import { parseEther } from "ethers";
 import { ref } from "vue";
 
 export interface TileInfo {
+  owner: string;
   level: bigint;
   type: string;
   name: string;
   description: string;
   image: string;
 }
-
-const gameMap = ref<HTMLElement | null>(null);
-const position = ref({ x: 0n, y: 0n, z: 0n });
-const selectedTile = ref<{ x: bigint; y: bigint; z: bigint } | null>(null);
 
 export enum Direction {
   Left = "left",
@@ -20,6 +18,21 @@ export enum Direction {
   Forward = "forward",
   Backward = "backward",
 }
+
+export const COORD_BASE_PRICE = parseEther("0.001");
+export const LEVEL_BASE_PRICE = parseEther("0.001");
+
+function getTokenLevelPrice(level: bigint) {
+  return LEVEL_BASE_PRICE * 2n ** level;
+}
+
+function getMintPriceForAccount(balance: bigint) {
+  return COORD_BASE_PRICE * 2n ** balance;
+}
+
+const gameMap = ref<HTMLElement | null>(null);
+const position = ref({ x: 0n, y: 0n, z: 0n });
+const selectedTile = ref<{ x: bigint; y: bigint; z: bigint } | null>(null);
 
 let movingIsBlocked = false;
 function move(direction: Direction) {
@@ -82,5 +95,7 @@ export function GameMapState() {
     position,
     selectedTile,
     move,
+    getTokenLevelPrice,
+    getMintPriceForAccount,
   };
 }
