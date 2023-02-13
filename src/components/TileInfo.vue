@@ -94,7 +94,7 @@ async function mintNft() {
       .get(tokenId.toString())
       .get("owner")
       .put(accountAddress);
-    indexer.get("tokens").get(tokenId.toString()).get("level").put("1");
+    indexer.get("tokens").get(tokenId.toString()).get("level").put("0");
     indexer.get("tokens").get(tokenId.toString()).get("type").put("base");
     indexer.get("tokens").get(tokenId.toString()).get("name").put("Base");
     indexer
