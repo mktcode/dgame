@@ -2,6 +2,7 @@
 import ModalOverlay from "./ModalOverlay.vue";
 import { WelcomeModalState } from "../state/WelcomeModal";
 import { GameMapState } from "@/state/GameMap";
+import { playAudio } from "@/lib/audio";
 
 const { isOpen } = WelcomeModalState();
 const { gameMap } = GameMapState();
@@ -14,17 +15,9 @@ function close() {
   isOpen.value = false;
   gameMap.value?.focus();
 
-  const introAudio = new Audio("/sounds/intro.mp3");
-  introAudio.volume = 0.1;
-  introAudio.play();
-
-  const ambientAudio = new Audio("/sounds/ambient.mp3");
-  ambientAudio.volume = 0.1;
-  ambientAudio.loop = true;
-  ambientAudio.play();
-  
-  const welcomeAudio = new Audio("/sounds/welcome.mp3");
-  setTimeout(() => welcomeAudio.play(), 2000);
+  playAudio("intro", 0.1);
+  playAudio("ambient", 0.1, true);
+  setTimeout(() => playAudio("welcome"), 2000);
 }
 </script>
 

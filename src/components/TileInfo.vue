@@ -6,6 +6,7 @@ import { mdiClose, mdiRefresh } from "@mdi/js";
 import { GameMapState, type TileInfo } from "../state/GameMap";
 import DGAME_ABI from "../contracts/DGame.json";
 import { indexer } from "../state/Gun";
+import { playAudio } from "@/lib/audio";
 
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
@@ -172,17 +173,14 @@ async function mintNft() {
     const tx = await contract.safeMint(coords.x, coords.y, coords.z, {
       value: mintPrice.value,
     });
-  
+
     isMinting.value = true;
-    const deployingBaseAudio = new Audio("/sounds/deploying-base.mp3");
-    deployingBaseAudio.play();
+    playAudio("deploying-base");
     await tx.wait();
-    const deploymentCompleteAudio = new Audio("/sounds/deployment-complete.mp3");
-    deploymentCompleteAudio.play();
+    playAudio("deployment-complete");
     isMinting.value = false;
   } catch {
-    const canceledAudio = new Audio("/sounds/canceled.mp3");
-    canceledAudio.play();
+    playAudio("canceled");
   }
 }
 
@@ -203,23 +201,20 @@ async function levelUp() {
     const tx = await contract.levelUp(existingTokenId.value.toString(), {
       value: levelPrice.value,
     });
-  
-    const upgradingBaseAudio = new Audio("/sounds/upgrading-base.mp3");
-    upgradingBaseAudio.play();
-  
+
+    playAudio("upgrading-base");
+
     await tx.wait();
-  
-    const upgradeCompleteAudio = new Audio("/sounds/upgrade-complete.mp3");
-    upgradeCompleteAudio.play();
-  
+
+    playAudio("upgrade-complete");
+
     indexer
       .get("tokens")
       .get(existingTokenId.value.toString())
       .get("level")
       .put((selectedTileInfo.value.level + 1n).toString());
   } catch {
-    const canceledAudio = new Audio("/sounds/canceled.mp3");
-    canceledAudio.play();
+    playAudio("canceled");
   }
 }
 
