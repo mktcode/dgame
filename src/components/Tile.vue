@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { indexer } from "../state/Gun";
 import { GameMapState, type TileInfo } from "../state/GameMap";
 import { playAudio } from "@/lib/audio";
@@ -13,6 +13,16 @@ const props = defineProps<{
 const { selectedTile } = GameMapState();
 
 const tileInfo = ref<TileInfo | null>(null);
+const isSelected = computed(() => {
+  if (!selectedTile.value) {
+    return false;
+  }
+  return (
+    selectedTile.value.x === props.x &&
+    selectedTile.value.y === props.y &&
+    selectedTile.value.z === props.z
+  );
+})
 
 onMounted(() => {
   indexer
@@ -55,11 +65,7 @@ function clickTile() {
     class="relative flex aspect-square w-40 min-w-[6rem] cursor-pointer items-center justify-center overflow-hidden rounded-lg border-sky-900 bg-sky-900 text-sm transition-all"
     :class="{
       'bg-opacity-10 hover:bg-opacity-20': !tileInfo,
-      'border-2':
-        selectedTile &&
-        selectedTile.x === x &&
-        selectedTile.y === y &&
-        selectedTile.z === z,
+      'border-4': isSelected
     }"
     @click="clickTile"
   >

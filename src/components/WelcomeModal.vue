@@ -17,7 +17,7 @@ function close() {
 
   playAudio("intro", 0.1);
   playAudio("ambient", 0.1, true);
-  setTimeout(() => playAudio("welcome"), 2000);
+  setTimeout(() => playAudio("welcome"), 1000);
 }
 </script>
 

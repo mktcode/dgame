@@ -127,7 +127,10 @@ async function mintNft() {
     isMinting.value = true;
     playAudio("deploying-base");
     await tx.wait();
-    playAudio("deployment-complete");
+    playAudio("deployment-complete-effect");
+    setTimeout(() => {
+      playAudio("deployment-complete");
+    }, 1000);
     isMinting.value = false;
   } catch (e) {
     playAudio("canceled");
