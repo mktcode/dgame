@@ -21,8 +21,8 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
   mapping (int256 => mapping(int256 => mapping(int256 => uint256))) public tokenIdsByCoordinate;
   mapping (uint256 => Coordinate) public coordinatesByTokenId;
   mapping (uint256 => uint256) public tokenLevels;
-  uint256 constant public COORD_BASE_PRICE = 0.001 ether;
-  uint256 constant public LEVEL_BASE_PRICE = 0.001 ether;
+  uint256 constant public COORD_BASE_PRICE = 0.0001 ether;
+  uint256 constant public LEVEL_BASE_PRICE = 0.0001 ether;
 
   constructor() ERC721("DGame", "DGAME") {
     _tokenIdCounter.increment();

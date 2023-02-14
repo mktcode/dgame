@@ -19,8 +19,8 @@ export enum Direction {
   Backward = "backward",
 }
 
-export const COORD_BASE_PRICE = parseEther("0.001");
-export const LEVEL_BASE_PRICE = parseEther("0.001");
+export const COORD_BASE_PRICE = parseEther("0.0001");
+export const LEVEL_BASE_PRICE = parseEther("0.0001");
 
 function getTokenLevelPrice(level: bigint) {
   return LEVEL_BASE_PRICE * 2n ** level;
