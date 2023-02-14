@@ -116,6 +116,8 @@ async function mintNft() {
   });
 
   try {
+    playAudio("requesting-permission");
+
     const tx = await dgameContract.safeMint(coords.x, coords.y, coords.z, {
       value: getMintPriceForAccount(accountBalance.value),
     });
@@ -139,6 +141,8 @@ async function levelUp() {
   const { dgameContract } = await useDGameContract(account);
 
   try {
+    playAudio("requesting-permission");
+    
     const tx = await dgameContract.levelUp(existingTokenId.value.toString(), {
       value: getTokenLevelPrice(selectedTileInfo.value.level),
     });
