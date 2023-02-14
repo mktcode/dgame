@@ -26,8 +26,7 @@ function close() {
     <template #title> Welcome commander! </template>
     <template #body>
       <p class="text-gray-500">
-        This is an open source sci-fi browser game. You can play it for free but
-        you can also earn and spend cryptocurrency and NFTs.
+        This is an open source, sci-fi browser game with NFTs.
       </p>
       <p class="mt-5 text-xl text-gray-500">
         Use <strong>arrow keys</strong> to navigate through space on the
