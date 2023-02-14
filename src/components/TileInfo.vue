@@ -158,7 +158,10 @@ async function levelUp() {
 
     await tx.wait();
 
-    playAudio("upgrade-complete");
+    playAudio("upgrade-complete-effect");
+    setTimeout(() => {
+      playAudio("upgrade-complete");
+    }, 250);
 
     const newTokenLevel = await dgameContract.tokenLevels(
       existingTokenId.value.toString()
@@ -254,7 +257,7 @@ async function updateFromChain() {
 </script>
 
 <template>
-  <div class="grow overflow-y-auto bg-sky-900">
+  <div class="grow overflow-y-auto bg-slate-900">
     <div v-if="selectedTile">
       <div class="flex items-center justify-between">
         <div class="mr-auto p-1 text-lg font-bold text-slate-300">

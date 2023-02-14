@@ -20,11 +20,11 @@ const { accountAddress, connect, shortenAddress } = useWeb3Account();
       <button v-else-if="IS_ETHEREUM_ENABLED" @click="connect">
         Connect Wallet
       </button>
+      <ResourcesInfo v-if="accountAddress" />
       <div class="py-1 text-center text-sky-700">
         x: {{ position.x.toString() }} y: {{ position.y.toString() }} z:
         {{ position.z.toString() }}
       </div>
-      <ResourcesInfo />
       <TileInfo />
     </div>
   </div>
