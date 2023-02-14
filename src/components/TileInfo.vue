@@ -72,6 +72,8 @@ watch(
 async function mintNft() {
   if (!selectedTile.value) return;
 
+  playAudio("button");
+
   const { account, accountAddress } = await connect();
   const { dgameContract } = await useDGameContract(account);
 
@@ -137,12 +139,14 @@ async function levelUp() {
   if (!selectedTileInfo.value) return;
   if (existingTokenId.value === null) return;
 
+  playAudio("button");
+
   const { account } = await connect();
   const { dgameContract } = await useDGameContract(account);
 
   try {
     playAudio("requesting-permission");
-    
+
     const tx = await dgameContract.levelUp(existingTokenId.value.toString(), {
       value: getTokenLevelPrice(selectedTileInfo.value.level),
     });

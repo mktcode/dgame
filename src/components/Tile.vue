@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import { indexer } from "../state/Gun";
 import { GameMapState, type TileInfo } from "../state/GameMap";
+import { playAudio } from "@/lib/audio";
 
 const props = defineProps<{
   x: bigint;
@@ -41,6 +42,12 @@ onUnmounted(() => {
     .get(props.z.toString())
     .off();
 });
+
+function clickTile() {
+  playAudio("button");
+  
+  selectedTile.value = { x: props.x, y: props.y, z: props.z };
+}
 </script>
 
 <template>
@@ -54,7 +61,7 @@ onUnmounted(() => {
         selectedTile.y === y &&
         selectedTile.z === z,
     }"
-    @click="selectedTile = { x, y, z }"
+    @click="clickTile"
   >
     <Transition>
       <img v-if="tileInfo && tileInfo.image" :src="tileInfo.image" alt="Tile" />
