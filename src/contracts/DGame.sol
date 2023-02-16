@@ -18,6 +18,9 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
     int256 z;
   }
 
+  event TokenMinted(uint256 tokenId, address owner, int256 x, int256 y, int256 z);
+  event LevelUp(uint256 tokenId, uint256 newLevel);
+
   mapping (int256 => mapping(int256 => mapping(int256 => uint256))) public tokenIdsByCoordinate;
   mapping (uint256 => Coordinate) public coordinatesByTokenId;
   mapping (uint256 => uint256) public tokenLevels;
@@ -63,6 +66,8 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
     
     _safeMint(_msgSender(), tokenId);
     payable(owner()).transfer(msg.value);
+
+    emit TokenMinted(tokenId, _msgSender(), x, y, z);
   }
 
   function updateUri(uint256 tokenId, string memory uri) public {
@@ -77,6 +82,8 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
     require(msg.value >= price, "Not enough ETH to level up");
     tokenLevels[tokenId] += 1;
     payable(owner()).transfer(msg.value);
+
+    emit LevelUp(tokenId, tokenLevels[tokenId]);
   }
 
   function getTokenLevelPrice(uint256 tokenId) public view returns (uint256) {

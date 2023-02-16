@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { indexer } from "../state/Gun";
+import { indexer } from "../state/Indexer";
 import { GameMapState, type TileInfo } from "../state/GameMap";
 import { playAudio } from "@/lib/audio";
 
@@ -25,7 +25,7 @@ const isSelected = computed(() => {
 })
 
 onMounted(() => {
-  indexer
+  indexer.storage
     .get("coords")
     .get(props.x.toString())
     .get(props.y.toString())
@@ -35,7 +35,7 @@ onMounted(() => {
         tileInfo.value = null;
         return;
       }
-      indexer
+      indexer.storage
         .get("tokens")
         .get(tokenId.toString())
         .once((data) => {
@@ -45,7 +45,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  indexer
+  indexer.storage
     .get("coords")
     .get(props.x.toString())
     .get(props.y.toString())

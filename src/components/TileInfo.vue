@@ -2,9 +2,9 @@
 import { ref, watch } from "vue";
 import { formatEther } from "ethers";
 import SvgIcon from "@jamescoyle/vue-icon";
-import { mdiClose, mdiRefresh } from "@mdi/js";
+import { mdiClose } from "@mdi/js";
 import { GameMapState, type TileInfo } from "../state/GameMap";
-import { indexer } from "../state/Gun";
+import { indexer } from "../state/Indexer";
 import { useWeb3Account, IS_ETHEREUM_ENABLED } from "../state/useWeb3Account";
 import { playAudio } from "@/lib/audio";
 import { useDGameContract } from "@/state/useDGameContract";
@@ -22,7 +22,7 @@ watch(
   selectedTile,
   (newValue, oldValue) => {
     if (oldValue) {
-      indexer
+      indexer.storage
         .get("coords")
         .get(oldValue.x.toString())
         .get(oldValue.y.toString())
@@ -42,7 +42,7 @@ watch(
       z: newValue.z.toString(),
     };
 
-    indexer
+    indexer.storage
       .get("coords")
       .get(coords.x)
       .get(coords.y)
@@ -55,7 +55,7 @@ watch(
           return;
         }
 
-        indexer
+        indexer.storage
           .get("tokens")
           .get(tokenId.toString())
           .once((data) => {
@@ -74,7 +74,7 @@ async function mintNft() {
 
   playAudio("button");
 
-  const { account, accountAddress } = await connect();
+  const { account } = await connect();
   const { dgameContract } = await useDGameContract(account);
 
   const coords = {
@@ -82,40 +82,6 @@ async function mintNft() {
     y: selectedTile.value.y.toString(),
     z: selectedTile.value.z.toString(),
   };
-
-  dgameContract.on("Transfer", async (_from, to, tokenId, event) => {
-    console.log(`Minted NFT ${tokenId} to ${to}`);
-
-    event.removeListener();
-
-    const ownerBalance = await dgameContract.balanceOf(accountAddress);
-
-    indexer.get("balances").get(accountAddress).put(ownerBalance.toString());
-    indexer
-      .get("tokens")
-      .get(tokenId.toString())
-      .get("owner")
-      .put(accountAddress);
-    indexer.get("tokens").get(tokenId.toString()).get("level").put("0");
-    indexer.get("tokens").get(tokenId.toString()).get("type").put("base");
-    indexer.get("tokens").get(tokenId.toString()).get("name").put("Base");
-    indexer
-      .get("tokens")
-      .get(tokenId.toString())
-      .get("description")
-      .put("A player's base");
-    indexer
-      .get("tokens")
-      .get(tokenId.toString())
-      .get("image")
-      .put("artwork/base2.jpeg");
-    indexer
-      .get("coords")
-      .get(coords.x)
-      .get(coords.y)
-      .get(coords.z)
-      .put(tokenId.toString());
-  });
 
   try {
     playAudio("requesting-permission");
@@ -162,96 +128,8 @@ async function levelUp() {
     setTimeout(() => {
       playAudio("upgrade-complete");
     }, 250);
-
-    const newTokenLevel = await dgameContract.tokenLevels(
-      existingTokenId.value.toString()
-    );
-
-    indexer
-      .get("tokens")
-      .get(existingTokenId.value.toString())
-      .get("level")
-      .put(newTokenLevel.toString());
   } catch {
     playAudio("canceled");
-  }
-}
-
-const isUpdatingFromChain = ref(false);
-
-async function updateFromChain() {
-  if (!selectedTile.value) return;
-
-  isUpdatingFromChain.value = true;
-
-  const { account } = await connect();
-  const { dgameContract } = await useDGameContract(account);
-
-  const coords = {
-    x: selectedTile.value.x.toString(),
-    y: selectedTile.value.y.toString(),
-    z: selectedTile.value.z.toString(),
-  };
-
-  const tokenId = await dgameContract.tokenIdsByCoordinate(
-    coords.x,
-    coords.y,
-    coords.z
-  );
-
-  if (tokenId === 0n) {
-    selectedTileInfo.value = null;
-    indexer.get("coords").get(coords.x).get(coords.y).get(coords.z).put(null);
-  } else {
-    const tileInfo: TileInfo = {
-      owner: (await dgameContract.ownerOf(tokenId)).toLowerCase(),
-      level: await dgameContract.tokenLevels(tokenId),
-      type: "base",
-      name: "Base",
-      description: "A player's base.",
-      image: "artwork/base2.jpeg",
-    };
-
-    selectedTileInfo.value = tileInfo;
-
-    indexer
-      .get("tokens")
-      .get(tokenId.toString())
-      .get("owner")
-      .put(tileInfo.owner);
-    indexer
-      .get("tokens")
-      .get(tokenId.toString())
-      .get("level")
-      .put(tileInfo.level.toString());
-    indexer
-      .get("tokens")
-      .get(tokenId.toString())
-      .get("type")
-      .put(tileInfo.type);
-    indexer
-      .get("tokens")
-      .get(tokenId.toString())
-      .get("name")
-      .put(tileInfo.name);
-    indexer
-      .get("tokens")
-      .get(tokenId.toString())
-      .get("description")
-      .put(tileInfo.description);
-    indexer
-      .get("tokens")
-      .get(tokenId.toString())
-      .get("image")
-      .put(tileInfo.image);
-    indexer
-      .get("coords")
-      .get(coords.x)
-      .get(coords.y)
-      .get(coords.z)
-      .put(tokenId.toString());
-
-    isUpdatingFromChain.value = false;
   }
 }
 </script>
@@ -263,13 +141,6 @@ async function updateFromChain() {
         <div class="mr-auto p-1 text-lg font-bold text-slate-300">
           {{ selectedTile.x }}/{{ selectedTile.y }}/{{ selectedTile.z }}
         </div>
-        <button v-if="IS_ETHEREUM_ENABLED" @click="updateFromChain">
-          <svg-icon
-            type="mdi"
-            :path="mdiRefresh"
-            :class="{ 'animate-spin': isUpdatingFromChain }"
-          ></svg-icon>
-        </button>
         <button @click="selectedTile = null">
           <svg-icon type="mdi" :path="mdiClose"></svg-icon>
         </button>
