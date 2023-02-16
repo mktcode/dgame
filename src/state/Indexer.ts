@@ -1,10 +1,10 @@
-import { Web3IndexerClient } from 'web3-indexer';
+import { Web3GunClient } from 'web3gun';
 import DGAME_ABI from '../contracts/DGame.json';
 
 const ADDRESS = import.meta.env.VITE_DGAME_CONTRACT_ADDRESS;
 const PROVIDER_URL = "https://goerli.infura.io/v3/aa26f7213d2046c3a20c750679140729";
 
-export const indexer = new Web3IndexerClient(PROVIDER_URL);
+export const indexer = new Web3GunClient(PROVIDER_URL);
 
 indexer.contract(ADDRESS, DGAME_ABI, async (dgameContract, storage) => {
   dgameContract.on("TokenMinted", async (tokenId: bigint, owner: string, x: bigint, y: bigint, z: bigint) => {
