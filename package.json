@@ -19,7 +19,7 @@
     "ethers": "^6.0.3",
     "gun": "^0.2020.1239",
     "vue": "^3.2.45",
-    "web3-indexer": "^0.0.1"
+    "web3-indexer": "^1.1.0"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",
