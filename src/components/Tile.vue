@@ -22,7 +22,7 @@ const isSelected = computed(() => {
     selectedTile.value.y === props.y &&
     selectedTile.value.z === props.z
   );
-})
+});
 
 onMounted(() => {
   indexer.storage
@@ -55,7 +55,7 @@ onUnmounted(() => {
 
 function clickTile() {
   playAudio("button");
-  
+
   selectedTile.value = { x: props.x, y: props.y, z: props.z };
 }
 </script>
@@ -65,7 +65,7 @@ function clickTile() {
     class="relative flex aspect-square w-40 min-w-[6rem] cursor-pointer items-center justify-center overflow-hidden rounded-lg border-sky-900 bg-sky-900 text-sm transition-all"
     :class="{
       'bg-opacity-10 hover:bg-opacity-20': !tileInfo,
-      'border-4': isSelected
+      'border-4': isSelected,
     }"
     @click="clickTile"
   >

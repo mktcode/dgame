@@ -23,7 +23,9 @@ async function connect() {
       accountAddress.value = (await account.getAddress()).toLowerCase();
 
       const { dgameContract } = await useDGameContract(account);
-      accountBalance.value = await dgameContract.balanceOf(accountAddress.value);
+      accountBalance.value = await dgameContract.balanceOf(
+        accountAddress.value
+      );
 
       return {
         account,
