@@ -16,7 +16,7 @@
     "@mdi/js": "^7.1.96",
     "@openzeppelin/contracts": "^4.8.1",
     "@vueuse/core": "^9.12.0",
-    "@web3gun/client": "^1.0.0",
+    "@web3gun/client": "^1.1.0",
     "ethers": "^6.0.3",
     "vue": "^3.2.45"
   },

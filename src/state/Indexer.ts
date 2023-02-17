@@ -5,9 +5,8 @@ const ADDRESS = import.meta.env.VITE_DGAME_CONTRACT_ADDRESS;
 const PROVIDER_URL =
   "https://goerli.infura.io/v3/aa26f7213d2046c3a20c750679140729";
 
-export const indexer = new Web3GunClient(PROVIDER_URL, [
-  "https://gun.mktcode.uber.space",
-]);
+export const indexer = new Web3GunClient(["https://gun.mktcode.uber.space"]);
+indexer.setProvider(PROVIDER_URL);
 
 indexer.contract(ADDRESS, DGAME_ABI, async (dgameContract, storage) => {
   dgameContract.on(
