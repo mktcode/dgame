@@ -20,7 +20,6 @@ indexer.contract(ADDRESS, DGAME_ABI, async (dgameContract, storage) => {
       storage.get("balances").get(owner).put(ownerBalance.toString());
       storage.get("tokens").get(tokenId.toString()).get("owner").put(owner);
       storage.get("tokens").get(tokenId.toString()).get("level").put("0");
-      console.log(`Reset level of token ${tokenId} to 0`);
       storage.get("tokens").get(tokenId.toString()).get("type").put("base");
       storage.get("tokens").get(tokenId.toString()).get("name").put("Base");
       storage
