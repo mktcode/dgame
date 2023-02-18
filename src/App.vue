@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import ResourcesInfo from "./components/ResourcesInfo.vue";
 import WelcomeModal from "./components/WelcomeModal.vue";
 import GameMap from "./components/GameMap.vue";
 import TileInfo from "./components/TileInfo.vue";
@@ -19,18 +18,17 @@ const { accountAddress, connect, shortenAddress } = useWeb3Account();;
         'hidden sm:flex': !selectedTile,
       }"
     >
-      <ResourcesInfo v-if="accountAddress" />
+      <button v-if="!accountAddress && IS_ETHEREUM_ENABLED" @click="connect">
+        Connect Wallet
+      </button>
+      <TileInfo />
       <div v-if="accountAddress" class="py-1 text-center text-sky-600 bg-sky-900">
         {{ shortenAddress(accountAddress) }}
       </div>
-      <button v-else-if="IS_ETHEREUM_ENABLED" @click="connect">
-        Connect Wallet
-      </button>
       <div class="py-1 text-center text-sky-600 bg-sky-900">
         x: {{ position.x.toString() }} y: {{ position.y.toString() }} z:
         {{ position.z.toString() }}
       </div>
-      <TileInfo />
     </div>
   </div>
   <WelcomeModal />

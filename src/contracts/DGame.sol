@@ -70,17 +70,13 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
     emit TokenMinted(tokenId, _msgSender(), x, y, z);
   }
 
-  function updateUri(uint256 tokenId, string memory uri) public {
-    require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not owner nor approved");
-    _setTokenURI(tokenId, uri);
-  }
-
-  function levelUp(uint256 tokenId) public payable {
+  function levelUp(uint256 tokenId, string memory uri) public payable {
     require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not owner nor approved");
 
     uint256 price = getTokenLevelPrice(tokenId);
     require(msg.value >= price, "Not enough ETH to level up");
     tokenLevels[tokenId] += 1;
+    _setTokenURI(tokenId, uri);
     payable(owner()).transfer(msg.value);
 
     emit LevelUp(tokenId, tokenLevels[tokenId]);

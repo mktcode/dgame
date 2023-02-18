@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { formatEther } from "ethers";
 import SvgIcon from "@jamescoyle/vue-icon";
-import { mdiClose } from "@mdi/js";
+import { mdiClose, mdiCamera } from "@mdi/js";
+import { pin } from '@snapshot-labs/pineapple';
 import { GameMapState, type TileInfo } from "../state/GameMap";
 import { indexer } from "../state/Indexer";
 import { useWeb3Account, IS_ETHEREUM_ENABLED } from "../state/useWeb3Account";
@@ -17,6 +18,8 @@ const { selectedTile, getTokenLevelPrice, getMintPriceForAccount } =
 const selectedTileInfo = ref<TileInfo | null>(null);
 const existingTokenId = ref<bigint | null>(null);
 const isMinting = ref(false);
+
+const isOwner = computed(() => selectedTileInfo.value?.owner === accountAddress.value)
 
 watch(
   selectedTile,
@@ -103,6 +106,9 @@ async function mintNft() {
   }
 }
 
+const imageInput = ref<HTMLInputElement | null>(null);
+const imageUrl = ref<string | null>(null);
+
 async function levelUp() {
   if (!selectedTile.value) return;
   if (!selectedTileInfo.value) return;
@@ -113,10 +119,17 @@ async function levelUp() {
   const { account } = await connect();
   const { dgameContract } = await useDGameContract(account);
 
+  const nftMetadata = {
+    name: "Base 1",
+    description: "A player's base",
+    image: imageUrl.value,
+  };
+  const receipt = await pin(nftMetadata);
+
   try {
     playAudio("requesting-permission");
 
-    const tx = await dgameContract.levelUp(existingTokenId.value.toString(), {
+    const tx = await dgameContract.levelUp(existingTokenId.value.toString(), 'ipfs://ipfs/' + receipt.cid, {
       value: getTokenLevelPrice(selectedTileInfo.value.level),
     });
 
@@ -132,13 +145,26 @@ async function levelUp() {
     playAudio("canceled");
   }
 }
+
+const loadImage = (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      imageUrl.value = reader.result as string;
+    };
+  } else {
+    imageUrl.value = null;
+  }
+};
 </script>
 
 <template>
   <div class="grow overflow-y-auto bg-slate-900">
     <div v-if="selectedTile">
       <div class="flex items-center justify-between">
-        <div class="mr-auto p-1 text-lg font-bold text-slate-300">
+        <div class="mr-auto px-2 text-lg font-bold text-slate-300">
           {{ selectedTile.x }}/{{ selectedTile.y }}/{{ selectedTile.z }}
         </div>
         <button @click="selectedTile = null">
@@ -147,20 +173,36 @@ async function levelUp() {
       </div>
       <Transition name="fade-fast" mode="out-in">
         <div v-if="selectedTileInfo">
-          <img
-            :src="selectedTileInfo.image"
-            :alt="selectedTileInfo.name"
-            class="rounded"
-          />
+          <template v-if="isOwner">
+            <img v-if="imageUrl" :src="imageUrl" :alt="selectedTileInfo.name" />
+            <div v-else @click="imageInput?.click()" class="cursor-pointer relative">
+              <div class="flex items-center justify-center absolute inset-0 opacity-0 hover:opacity-20 transition-opacity">
+                <svg-icon type="mdi" :path="mdiCamera" class="w-24 h-24" />
+              </div>
+              <img
+                :src="selectedTileInfo.image"
+                :alt="selectedTileInfo.name"
+              />
+            </div>
+          </template>
+          <template v-else>
+            <img
+              :src="selectedTileInfo.image"
+              :alt="selectedTileInfo.name"
+            />
+          </template>
+
+          <input type="file" ref="imageInput" @change="loadImage" accept="image/*" class="hidden" />
+          
           <button
-            v-if="selectedTileInfo.owner === accountAddress"
+            v-if="isOwner"
             class="w-full"
             @click="levelUp"
           >
             Level up for
             {{ formatEther(getTokenLevelPrice(selectedTileInfo.level)) }} ETH
           </button>
-          <div class="px-3 pt-1 text-lg font-bold text-slate-400">
+          <div class="flex px-3 pt-1 text-lg font-bold text-slate-400">
             {{ selectedTileInfo.name }} (Lvl {{ selectedTileInfo.level }})
           </div>
           <p class="px-3 text-slate-500">{{ selectedTileInfo.description }}</p>
