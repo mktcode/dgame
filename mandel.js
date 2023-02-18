@@ -39,15 +39,14 @@ function getRainbowColor(iterCount) {
 }
 
 function drawMandelbrotSet() {
-  console.log("Drawing mandelbrot set", zoom, xOffset, yOffset)
   const xRange = (xmax - xmin) / zoom;
   const yRange = (ymax - ymin) / zoom;
   const centerX = (xmax + xmin) / 2 + xOffset / canvas.width * xRange;
   const centerY = (ymax + ymin) / 2 + yOffset / canvas.height * yRange;
   for (let i = 0; i < canvas.width; i++) {
     for (let j = 0; j < canvas.height; j++) {
-      const x = centerX + (i / canvas.width - 0.5) * xRange;
-      const y = centerY + (j / canvas.height - 0.5) * yRange;
+      const x = (centerX * zoom) + (i / canvas.width - 0.5) * xRange;
+      const y = (centerY * zoom) + (j / canvas.height - 0.5) * yRange;
       const iterCount = isInMandelbrotSet(x, y);
       ctx.fillStyle = getRainbowColor(iterCount);
       ctx.fillRect(2 * i, 2 * j, 2, 2);
@@ -67,17 +66,17 @@ document.addEventListener("keydown", (event) => {
       shiftIsPressed = true;
       break;
     case "ArrowLeft":
-      xOffset -= MOVEMENT_FACTOR
+      xOffset -= MOVEMENT_FACTOR / zoom
       break;
     case "ArrowRight":
-      xOffset += MOVEMENT_FACTOR
+      xOffset += MOVEMENT_FACTOR / zoom
       break;
     case "ArrowUp":
       if (shiftIsPressed) {
         zoom *= 1.1;
         normalZoom += MOVEMENT_FACTOR;
       } else {
-        yOffset -= MOVEMENT_FACTOR
+        yOffset -= MOVEMENT_FACTOR / zoom
       }
       break;
     case "ArrowDown":
@@ -85,7 +84,7 @@ document.addEventListener("keydown", (event) => {
         zoom /= 1.1;
         normalZoom -= MOVEMENT_FACTOR;
       } else {
-        yOffset += MOVEMENT_FACTOR
+        yOffset += MOVEMENT_FACTOR / zoom
       }
       break;
     default:
