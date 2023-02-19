@@ -1,38 +1,10 @@
-import { parseEther } from "ethers";
 import { ref } from "vue";
-
-export interface TileInfo {
-  owner: string;
-  level: bigint;
-  type: string;
-  name: string;
-  description: string;
-  image: string;
-}
-
-export enum Direction {
-  Left = "left",
-  Right = "right",
-  Up = "up",
-  Down = "down",
-  Forward = "forward",
-  Backward = "backward",
-}
-
-export const COORD_BASE_PRICE = parseEther("0.0001");
-export const LEVEL_BASE_PRICE = parseEther("0.0001");
-
-function getTokenLevelPrice(level: bigint) {
-  return LEVEL_BASE_PRICE * 2n ** level;
-}
-
-function getMintPriceForAccount(balance: bigint) {
-  return COORD_BASE_PRICE * 2n ** balance;
-}
+import { jsonStringifyBigInts, type Coordinate } from "@/lib/coordinates";
+import { Direction } from "@/lib/game";
 
 const gameMap = ref<HTMLElement | null>(null);
-const position = ref({ x: 0n, y: 0n, z: 0n });
-const selectedTile = ref<{ x: bigint; y: bigint; z: bigint } | null>(null);
+const position = ref<Coordinate>({ x: 0n, y: 0n, z: 0n });
+const selectedCoordinate = ref<Coordinate>({ x: 1n, y: 1n, z: 0n });
 
 let movingIsBlocked = false;
 function move(direction: Direction) {
@@ -59,6 +31,8 @@ function move(direction: Direction) {
       moveBackward();
       break;
   }
+
+  localStorage.setItem("position", jsonStringifyBigInts(position.value));
 
   setTimeout(() => {
     movingIsBlocked = false;
@@ -93,9 +67,7 @@ export function GameMapState() {
   return {
     gameMap,
     position,
-    selectedTile,
+    selectedCoordinate,
     move,
-    getTokenLevelPrice,
-    getMintPriceForAccount,
   };
 }

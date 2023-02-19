@@ -19,7 +19,7 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
   }
 
   event TokenMinted(uint256 tokenId, address owner, int256 x, int256 y, int256 z);
-  event LevelUp(uint256 tokenId, uint256 newLevel);
+  event LevelUp(uint256 tokenId, uint256 newLevel, string newUri);
 
   mapping (int256 => mapping(int256 => mapping(int256 => uint256))) public tokenIdsByCoordinate;
   mapping (uint256 => Coordinate) public coordinatesByTokenId;
@@ -54,7 +54,7 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
   }
   /** End required overrides */
 
-  function safeMint(int256 x, int256 y, int256 z) public payable onlyAvailableCoords(x, y, z) {
+  function safeMint(int256 x, int256 y, int256 z, string memory uri) public payable onlyAvailableCoords(x, y, z) {
     uint256 price = getMintPrice(_msgSender());
     require(msg.value >= price, "Not enough ETH to mint");
 
@@ -65,21 +65,22 @@ contract DGame is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
     coordinatesByTokenId[tokenId] = Coordinate(x, y, z);
     
     _safeMint(_msgSender(), tokenId);
+    _setTokenURI(tokenId, uri);
     payable(owner()).transfer(msg.value);
 
     emit TokenMinted(tokenId, _msgSender(), x, y, z);
   }
 
-  function levelUp(uint256 tokenId, string memory uri) public payable {
+  function levelUp(uint256 tokenId, string memory newUri) public payable {
     require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not owner nor approved");
 
     uint256 price = getTokenLevelPrice(tokenId);
     require(msg.value >= price, "Not enough ETH to level up");
     tokenLevels[tokenId] += 1;
-    _setTokenURI(tokenId, uri);
+    _setTokenURI(tokenId, newUri);
     payable(owner()).transfer(msg.value);
 
-    emit LevelUp(tokenId, tokenLevels[tokenId]);
+    emit LevelUp(tokenId, tokenLevels[tokenId], newUri);
   }
 
   function getTokenLevelPrice(uint256 tokenId) public view returns (uint256) {

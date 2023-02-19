@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { indexer } from "../state/Indexer";
-import { GameMapState, type TileInfo } from "../state/GameMap";
+import { contractStorage } from "../state/Indexer";
+import { GameMapState } from "../state/GameMap";
 import { playAudio } from "@/lib/audio";
+import type { TileInfo } from "@/lib/game";
 
 const props = defineProps<{
   x: bigint;
@@ -10,22 +11,22 @@ const props = defineProps<{
   z: bigint;
 }>();
 
-const { selectedTile } = GameMapState();
+const { selectedCoordinate } = GameMapState();
 
 const tileInfo = ref<TileInfo | null>(null);
 const isSelected = computed(() => {
-  if (!selectedTile.value) {
+  if (!selectedCoordinate.value) {
     return false;
   }
   return (
-    selectedTile.value.x === props.x &&
-    selectedTile.value.y === props.y &&
-    selectedTile.value.z === props.z
+    selectedCoordinate.value.x === props.x &&
+    selectedCoordinate.value.y === props.y &&
+    selectedCoordinate.value.z === props.z
   );
 });
 
 onMounted(() => {
-  indexer.storage
+  contractStorage
     .get("coords")
     .get(props.x.toString())
     .get(props.y.toString())
@@ -35,7 +36,7 @@ onMounted(() => {
         tileInfo.value = null;
         return;
       }
-      indexer.storage
+      contractStorage
         .get("tokens")
         .get(tokenId.toString())
         .once((data) => {
@@ -45,7 +46,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  indexer.storage
+  contractStorage
     .get("coords")
     .get(props.x.toString())
     .get(props.y.toString())
@@ -56,21 +57,26 @@ onUnmounted(() => {
 function clickTile() {
   playAudio("button");
 
-  selectedTile.value = { x: props.x, y: props.y, z: props.z };
+  selectedCoordinate.value = { x: props.x, y: props.y, z: props.z };
 }
 </script>
 
 <template>
   <div
-    class="relative flex aspect-square w-40 min-w-[6rem] cursor-pointer items-center justify-center overflow-hidden rounded-lg border-sky-900 bg-sky-900 text-sm transition-all"
-    :class="{
-      'bg-opacity-10 hover:bg-opacity-20': !tileInfo,
-      'border-4': isSelected,
-    }"
+    class="relative flex aspect-square w-40 min-w-[6rem]"
     @click="clickTile"
   >
-    <Transition>
-      <img v-if="tileInfo && tileInfo.image" :src="tileInfo.image" alt="Tile" />
-    </Transition>
+    <div
+      class="absolute inset-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg border-4 border-sky-900 bg-sky-900 text-sm transition-all"
+      :class="{
+        'bg-opacity-10 hover:bg-opacity-20': !tileInfo,
+        'border-opacity-50': isSelected,
+        'border-opacity-0': !isSelected,
+      }"
+    >
+      <Transition>
+        <img v-if="tileInfo && tileInfo.image" :src="tileInfo.image" alt="Tile" />
+      </Transition>
+    </div>
   </div>
 </template>

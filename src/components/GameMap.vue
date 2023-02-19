@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import Tile from "./Tile.vue";
-import { Direction, GameMapState } from "../state/GameMap";
+import { computed, ref } from "vue";
+import Tile from "@/components/Tile.vue";
+import { GameMapState } from "@/state/GameMap";
+import { Direction } from "@/lib/game";
 
 const { gameMap, position, move } = GameMapState();
 
@@ -24,18 +25,19 @@ const visibleTilesY = computed(() => {
 
   return tiles;
 });
+
+const backgroundStyles = ref({
+  backgroundImage: `url(artwork/spaces/space1.jpeg)`,
+  backgroundPositionX: position.value.x % (position.value.x + 1n) + "%",
+  backgroundPositionY: position.value.y % (position.value.y + 1n) + "%",
+  backgroundSize: "100%",
+});
 </script>
 
 <template>
   <div
     ref="gameMap"
-    class="grow space-y-1 overflow-hidden border-8 border-transparent bg-slate-900 bg-contain bg-blend-multiply transition-all hover:border-sky-500 hover:border-opacity-10 focus:border-sky-900 focus:border-opacity-50"
-    :style="{
-      backgroundImage: 'url(artwork/spaces/space1.jpeg)',
-      backgroundPositionX: position.x + '%',
-      backgroundPositionY: position.y + '%',
-      backgroundSize: position.z * 2n + 300n + '%',
-    }"
+    class="grow relative overflow-hidden border-4 border-sky-900 border-opacity-10 transition-all hover:border-opacity-30 focus:border-opacity-100 rounded-3xl"
     tabindex="1"
     @keyup.left="move(Direction.Left)"
     @keyup.right="move(Direction.Right)"
@@ -45,17 +47,22 @@ const visibleTilesY = computed(() => {
     @keyup.shift.up="move(Direction.Forward)"
   >
     <div
-      v-for="y in visibleTilesY"
-      :key="`y-${y.toString()}`"
-      class="flex space-x-1"
+      class="absolute overflow-hidden bg-contain bg-blend-multiply bg-slate-900 space-y-2 p-2"
+      :style="backgroundStyles"
     >
-      <Tile
-        v-for="x in visibleTilesX"
-        :key="`${x}-${y}-${position.z.toString()}`"
-        :x="x"
-        :y="y"
-        :z="position.z"
-      />
+      <div
+        v-for="y in visibleTilesY"
+        :key="`y-${y.toString()}`"
+        class="flex space-x-2"
+      >
+        <Tile
+          v-for="x in visibleTilesX"
+          :key="`${x}-${y}-${position.z.toString()}`"
+          :x="x"
+          :y="y"
+          :z="position.z"
+        />
+      </div>
     </div>
   </div>
 </template>
