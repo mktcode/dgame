@@ -7,7 +7,7 @@ const xmin = -1;
 const xmax = 1;
 const ymin = -1;
 const ymax = 1;
-const maxIterations = 1000;
+const maxIterations = 3000;
 
 let zoom = 1;
 let xOffset = 0;
@@ -91,6 +91,11 @@ document.addEventListener("keydown", (event) => {
     default:
       return;
   }
+
+  if (zoom > Number.MAX_SAFE_INTEGER * 0.9) {
+    zoom = 0.1;
+  }
+
   drawMandelbrotSet();
 });
 
