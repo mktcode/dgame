@@ -71,11 +71,3 @@ export function randomCoordinate(): { x: bigint, y: bigint, z: bigint } {
     z: BigInt(getNumberBetween(-1000000000, 1000000000)),
   }
 }
-
-export function jsonStringifyBigInts(obj: any): string {
-  return JSON.stringify(obj, (_, value) => typeof value === 'bigint' ? value.toString() : value);
-}
-
-export function jsonParseBigInts(str: string): any {
-  return JSON.parse(str, (_, value) => isBigIntLike(value) ? BigInt(value) : value);
-}

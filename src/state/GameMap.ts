@@ -1,5 +1,5 @@
 import { computed, ref } from "vue";
-import { jsonStringifyBigInts, type Coordinate } from "@/lib/coordinates";
+import type { Coordinate } from "@/lib/coordinates";
 import { Direction } from "@/lib/game";
 
 const gameMap = ref<HTMLElement | null>(null);
@@ -47,7 +47,9 @@ function move(direction: Direction) {
       break;
   }
 
-  localStorage.setItem("position", jsonStringifyBigInts(position.value));
+  localStorage.setItem("x", position.value.x.toString());
+  localStorage.setItem("y", position.value.y.toString());
+  localStorage.setItem("z", position.value.z.toString());
 
   setTimeout(() => {
     movingIsBlocked = false;

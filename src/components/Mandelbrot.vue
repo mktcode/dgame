@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref, watch } from 'vue';
 import SvgIcon from "@jamescoyle/vue-icon";
 import {
   mdiChevronLeft,
@@ -10,122 +10,49 @@ import {
   mdiMagnifyMinus,
 } from "@mdi/js";
 import { Direction } from "@/lib/game";
+import { GameMapState } from '@/state/GameMap';
+import { drawMandelbrotSet, move, zoomToTarget } from '@/lib/mandelbrot';
+
+const { position } = GameMapState();
 
 const canvas = ref<HTMLCanvasElement | null>(null);
 
-const MOVEMENT_FACTOR = 1;
-const ZOOM_FACTOR = 1.1;
-
-const xmin = -.1;
-const xmax = .1;
-const ymin = -.1;
-const ymax = .1;
-const maxIterations = 50;
-
-let zoom = 0.1;
-let xOffset = 0;
-let yOffset = 0;
-
-function isInMandelbrotSet(x0: number, y0: number) {
-  let x = 0;
-  let y = 0;
-  for (let i = 0; i < maxIterations; i++) {
-    const xtemp = x * x - y * y + x0;
-    const ytemp = 2 * x * y + y0;
-    x = xtemp;
-    y = ytemp;
-    if (x * x + y * y > 4) {
-      return i;
-    }
+watch(position, () => {
+  if (canvas.value) {
+    drawMandelbrotSet(canvas.value);
   }
-  return -1;
-}
+}, { immediate: true, deep: true });
 
-function getRainbowColor(iterCount: number) {
-  if (iterCount === -1) {
-    return "#000";
-  } else {
-    const hue = -175 + iterCount / maxIterations * 180;
-    return `hsl(${hue}, 100%, 50%)`;
+watch(canvas, () => {
+  if (canvas.value) {
+    canvas.value.width = 50;
+    canvas.value.height = 50;
+    drawMandelbrotSet(canvas.value);
   }
-}
+}, { immediate: true });
 
-function drawMandelbrotSet() {
-  if (!canvas.value) return;
-  const ctx = canvas.value.getContext("2d");
-  if (!ctx) return;
-
-  canvas.value.width = 75;
-  canvas.value.height = 75;
-  
-  const canvasWidth = canvas.value.width;
-  const canvasHeight = canvas.value.height;
-  const xRange = (xmax - xmin) / zoom;
-  const yRange = (ymax - ymin) / zoom;
-  const centerX = (xmax + xmin) / 2 + xOffset / canvasWidth * xRange;
-  const centerY = (ymax + ymin) / 2 + yOffset / canvasHeight * yRange;
-  for (let i = 0; i < canvasWidth; i++) {
-    for (let j = 0; j < canvasHeight; j++) {
-      const x = ((centerX * zoom) + (i / canvasWidth - 0.5) * xRange);
-      const y = ((centerY * zoom) + (j / canvasHeight - 0.5) * yRange);
-      const iterCount = isInMandelbrotSet(x, y);
-      ctx.fillStyle = getRainbowColor(iterCount);
-      ctx.fillRect(i, j, 1, 1);
-    }
+const targets = [
+  [ 62.51, 0, 100000.9 ],
+  [ 0, 0, 0.1 ],
+  [ -179.67670033502017, -70, 10.671895716335978 ],
+  [ -177.42780279723215, -70, 399.17525258063944 ],
+  [ -177.42780279723215, -70, 99995399.17525258063944 ],
+  [ -179.48929220687117, -56.41334259080523, 1.1],
+  [ -140.15330133850924, 139.30886107163212, 169.2892739326841],
+  [ 0, 0, 0.01 ]
+]
+let currentTarget = 0;
+const isMoving = ref(false);
+async function moveTo() {
+  isMoving.value = true;
+  const [ x, y, z ] = targets[currentTarget];
+  await zoomToTarget(x, y ,z, canvas.value);
+  isMoving.value = false;
+  currentTarget++;
+  if (currentTarget >= targets.length) {
+    currentTarget = 0;
   }
 }
-
-function move(direction: Direction) {
-  switch (direction) {
-    case Direction.Left:
-      moveLeft();
-      break;
-    case Direction.Right:
-      moveRight();
-      break;
-    case Direction.Up:
-      moveUp();
-      break;
-    case Direction.Down:
-      moveDown();
-      break;
-    case Direction.Forward:
-      zoomIn();
-      break;
-    case Direction.Backward:
-      zoomOut();
-      break;
-  }
-  drawMandelbrotSet();
-}
-
-function moveLeft() {
-  xOffset -= MOVEMENT_FACTOR / zoom * 5
-}
-
-function moveRight() {
-  xOffset += MOVEMENT_FACTOR / zoom * 5
-}
-
-function moveUp() {
-  yOffset -= MOVEMENT_FACTOR / zoom * 5
-}
-
-function moveDown() {
-  yOffset += MOVEMENT_FACTOR / zoom * 5
-}
-
-function zoomIn() {
-  zoom *= ZOOM_FACTOR;
-}
-
-function zoomOut() {
-  zoom /= ZOOM_FACTOR;
-}
-
-onMounted(() => {
-  drawMandelbrotSet();
-});
 </script>
 
 <template>
@@ -136,23 +63,26 @@ onMounted(() => {
       style="image-rendering: optimizeSpeed;"
     />
     <div class="grid grid-cols-3 gap-1 rounded-b-xl bg-sky-800">
-      <button @click="move(Direction.Backward)">
+      <button @click="move(Direction.Backward, canvas)">
         <svg-icon type="mdi" :path="mdiMagnifyMinus" class="inline" />
       </button>
-      <button @click="move(Direction.Up)">
+      <button @click="move(Direction.Up, canvas)">
         <svg-icon type="mdi" :path="mdiChevronUp" class="inline" />
       </button>
-      <button @click="move(Direction.Forward)">
+      <button @click="move(Direction.Forward, canvas)">
         <svg-icon type="mdi" :path="mdiMagnifyPlus" class="inline" />
       </button>
-      <button @click="move(Direction.Left)">
+      <button @click="move(Direction.Left, canvas)">
         <svg-icon type="mdi" :path="mdiChevronLeft" class="inline" />
       </button>
-      <button @click="move(Direction.Down)">
+      <button @click="move(Direction.Down, canvas)">
         <svg-icon type="mdi" :path="mdiChevronDown" class="inline" />
       </button>
-      <button @click="move(Direction.Right)">
+      <button @click="move(Direction.Right, canvas)">
         <svg-icon type="mdi" :path="mdiChevronRight" class="inline" />
+      </button>
+      <button @click="moveTo()" class="col-span-3" :disabled="isMoving">
+        next
       </button>
     </div>
   </div>

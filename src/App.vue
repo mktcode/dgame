@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { jsonStringifyBigInts, randomCoordinate, isCoordinateLike, toCoordinate } from '@/lib/coordinates';
+import { randomCoordinate, isCoordinateLike, toCoordinate } from '@/lib/coordinates';
 import { GameMapState } from './state/GameMap';
 
 const route = useRoute();
@@ -21,7 +21,9 @@ if (isCoordinateLike(route.params)) {
   position.value = randomCoordinate();
 }
 
-localStorage.setItem("position", jsonStringifyBigInts(position.value));
+localStorage.setItem("x", position.value.x.toString());
+localStorage.setItem("y", position.value.y.toString());
+localStorage.setItem("z", position.value.z.toString());
 </script>
 
 <template>
