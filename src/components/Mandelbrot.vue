@@ -36,14 +36,16 @@ const targets = [
   [ 0, 0, 0.1 ],
   [ -179.67670033502017 * 2, -70 * 2, 10.671895716335978 * 2 ],
   [ -177.42780279723215 * 2, -70 * 2, 399.17525258063944 * 2 ],
-  [ -177.42780279723215 * 2, -70 * 2, 99995399.17525258063944 * 2 ],
+  [ -177.42780279723215 * 2, -70 * 2, 5399.17525258063944 * 2 ],
   [ -179.48929220687117 * 2, -56.41334259080523 * 2, 1.1 * 2],
-  [ -140.15330133850924 * 2, 139.30886107163212 * 2, 169.2892739326841 * 2],
+  [ -140.15330133850924 * 2, 139.30886107163212 * 2, 35.2892739326841 * 2],
   [ 0, 0, 0.01 ]
 ]
 let currentTarget = 0;
+const isPlaying = ref(false);
 const isMoving = ref(false);
-async function moveTo() {
+
+async function moveNext() {
   isMoving.value = true;
   const [ x, y, z ] = targets[currentTarget];
   await zoomToTarget(x, y ,z, canvas.value);
@@ -52,6 +54,22 @@ async function moveTo() {
   if (currentTarget >= targets.length) {
     currentTarget = 0;
   }
+  if (isPlaying.value) {
+    moveNext();
+  }
+}
+
+async function movePrev() {
+  isMoving.value = true;
+
+  currentTarget -= 1;
+  if (currentTarget < 0) {
+    currentTarget = targets.length - 1;
+  }
+  
+  const [ x, y, z ] = targets[currentTarget];
+  await zoomToTarget(x, y ,z, canvas.value);
+  isMoving.value = false;
 }
 </script>
 
@@ -81,8 +99,14 @@ async function moveTo() {
       <button @click="move(Direction.Right, canvas)">
         <svg-icon type="mdi" :path="mdiChevronRight" class="inline" />
       </button>
-      <button @click="moveTo()" class="col-span-3" :disabled="isMoving">
+      <button @click="movePrev()" class="col-span-1" :disabled="isMoving">
+        prev
+      </button>
+      <button @click="moveNext()" class="col-span-2" :disabled="isMoving">
         next
+      </button>
+      <button @click="isPlaying = !isPlaying" class="col-span-3">
+        {{ isPlaying ? 'stop' : 'play' }}
       </button>
     </div>
   </div>
