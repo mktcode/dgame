@@ -26,9 +26,9 @@ export function isCoordinateLike(coordinate: unknown): coordinate is CoordinateL
     "x" in coordinate &&
     "y" in coordinate &&
     "z" in coordinate &&
-    isBigIntLike(coordinate.x) &&
-    isBigIntLike(coordinate.y) &&
-    isBigIntLike(coordinate.z)
+    isBigIntLike((coordinate as CoordinateLike).x) &&
+    isBigIntLike((coordinate as CoordinateLike).y) &&
+    isBigIntLike((coordinate as CoordinateLike).z)
   );
 }
 
