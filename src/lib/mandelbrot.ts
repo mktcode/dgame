@@ -32,7 +32,7 @@ export function getRainbowColor(iterCount: number) {
   if (iterCount === -1) {
     return "#000";
   } else {
-    const hue = -175 + iterCount / MAX_ITERATIONS * 180;
+    const hue = iterCount / MAX_ITERATIONS * 360;
     return `hsl(${hue}, 100%, 50%)`;
   }
 }

@@ -7,7 +7,7 @@ const position = ref<Coordinate>({ x: 0n, y: 0n, z: 0n });
 const selectedCoordinate = ref<Coordinate>({ x: 1n, y: 1n, z: 0n });
 const backgroundPositionX = ref(0)
 const backgroundPositionY = ref(0)
-const backgroundSize = ref(200)
+const backgroundSize = ref(100)
 const backgroundStyles = computed(() => ({
   backgroundImage: `url(artwork/spaces/space1.jpeg)`,
   backgroundPositionX: backgroundPositionX.value + "%",
