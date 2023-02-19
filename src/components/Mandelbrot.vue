@@ -129,13 +129,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="mt-3">
+  <div class="mb-3 p-2 bg-sky-900 rounded-xl">
     <canvas
       ref="canvas"
-      class="w-72 h-72 border-8 border-sky-900 rounded-xl"
+      class="w-full aspect-square rounded-t-xl"
       style="image-rendering: optimizeSpeed;"
     />
-    <div class="grid grid-cols-3 gap-1 mt-2">
+    <div class="grid grid-cols-3 gap-1 rounded-b-xl bg-sky-800">
       <button @click="move(Direction.Backward)">
         <svg-icon type="mdi" :path="mdiMagnifyMinus" class="inline" />
       </button>

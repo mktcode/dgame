@@ -151,6 +151,7 @@ const loadImage = () => {
         <input type="text" v-model="selectedCoordinate.z" @change="position = selectedCoordinate" class="bg-transparent text-sky-100 focus:bg-sky-900 w-full rounded px-2" />
       </div>
     </div>
+    <Mandelbrot />
     <Transition name="fade-fast" mode="out-in">
       <div v-if="selectedTileInfo">
         <template v-if="isOwner">
@@ -192,6 +193,5 @@ const loadImage = () => {
       </div>
       <DeployBase v-else />
     </Transition>
-    <Mandelbrot />
   </div>
 </template>

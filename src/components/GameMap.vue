@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import Tile from "@/components/Tile.vue";
 import { GameMapState } from "@/state/GameMap";
 import { Direction } from "@/lib/game";
 
-const { gameMap, position, move } = GameMapState();
+const { gameMap, position, move, backgroundStyles } = GameMapState();
 
 const visibleTilesX = computed(() => {
   const tiles = [];
@@ -25,13 +25,6 @@ const visibleTilesY = computed(() => {
 
   return tiles;
 });
-
-const backgroundStyles = ref({
-  backgroundImage: `url(artwork/spaces/space1.jpeg)`,
-  backgroundPositionX: position.value.x % (position.value.x + 1n) + "%",
-  backgroundPositionY: position.value.y % (position.value.y + 1n) + "%",
-  backgroundSize: "100%",
-});
 </script>
 
 <template>
@@ -47,7 +40,7 @@ const backgroundStyles = ref({
     @keyup.shift.up="move(Direction.Forward)"
   >
     <div
-      class="absolute overflow-hidden bg-contain bg-blend-multiply bg-slate-900 space-y-2 p-2"
+      class="absolute overflow-hidden bg-cover bg-blend-multiply bg-slate-900 space-y-2 p-2"
       :style="backgroundStyles"
     >
       <div
