@@ -11,15 +11,14 @@ import {
 } from "@mdi/js";
 import { Direction } from "@/lib/game";
 import { GameMapState } from '@/state/GameMap';
-import { drawMandelbrotSet, move, zoomToTarget } from '@/lib/mandelbrot';
+import { MandelbrotState } from '@/state/MandelbrotState';
 
 const { position } = GameMapState();
-
-const canvas = ref<HTMLCanvasElement | null>(null);
+const { canvas, drawMandelbrotSet, move, zoomToTarget, currentZoom, currentOffsetX, currentOffsetY } = MandelbrotState();
 
 watch(position, () => {
   if (canvas.value) {
-    drawMandelbrotSet(canvas.value);
+    drawMandelbrotSet();
   }
 }, { immediate: true, deep: true });
 
@@ -27,7 +26,7 @@ watch(canvas, () => {
   if (canvas.value) {
     canvas.value.width = 100;
     canvas.value.height = 100;
-    drawMandelbrotSet(canvas.value);
+    drawMandelbrotSet();
   }
 }, { immediate: true });
 
@@ -81,33 +80,36 @@ async function movePrev() {
       style="image-rendering: optimizeSpeed;"
     />
     <div class="grid grid-cols-3 gap-1 rounded-b-xl bg-sky-800">
-      <button @click="move(Direction.Backward, canvas)">
+      <button :disabled="isMoving" @click="move(Direction.Backward)">
         <svg-icon type="mdi" :path="mdiMagnifyMinus" class="inline" />
       </button>
-      <button @click="move(Direction.Up, canvas)">
+      <button :disabled="isMoving" @click="move(Direction.Up)">
         <svg-icon type="mdi" :path="mdiChevronUp" class="inline" />
       </button>
-      <button @click="move(Direction.Forward, canvas)">
+      <button :disabled="isMoving" @click="move(Direction.Forward)">
         <svg-icon type="mdi" :path="mdiMagnifyPlus" class="inline" />
       </button>
-      <button @click="move(Direction.Left, canvas)">
+      <button :disabled="isMoving" @click="move(Direction.Left)">
         <svg-icon type="mdi" :path="mdiChevronLeft" class="inline" />
       </button>
-      <button @click="move(Direction.Down, canvas)">
+      <button :disabled="isMoving" @click="move(Direction.Down)">
         <svg-icon type="mdi" :path="mdiChevronDown" class="inline" />
       </button>
-      <button @click="move(Direction.Right, canvas)">
+      <button :disabled="isMoving" @click="move(Direction.Right)">
         <svg-icon type="mdi" :path="mdiChevronRight" class="inline" />
       </button>
       <button @click="movePrev()" class="col-span-1" :disabled="isMoving">
         prev
       </button>
-      <button @click="moveNext()" class="col-span-2" :disabled="isMoving">
+      <button @click="moveNext()" class="col-span-1" :disabled="isMoving">
         next
       </button>
-      <button @click="isPlaying = !isPlaying" class="col-span-3">
+      <button @click="isPlaying = !isPlaying" class="col-span-1">
         {{ isPlaying ? 'stop' : 'play' }}
       </button>
     </div>
+    x: {{ currentOffsetX }}<br />
+    y: {{ currentOffsetY }}<br />
+    z: {{ currentZoom }}
   </div>
 </template>
