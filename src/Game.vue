@@ -5,9 +5,11 @@ import GameMenu from "./components/GameMenu.vue";
 </script>
 
 <template>
-  <div class="flex h-screen space-x-3 p-3">
-    <GameMap />
-    <GameMenu />
+  <div>
+    <div class="flex h-screen space-x-3 p-3">
+      <GameMap />
+      <GameMenu />
+    </div>
+    <WelcomeModal />
   </div>
-  <WelcomeModal />
 </template>

@@ -31,7 +31,5 @@ localStorage.setItem("z", position.value.z.toString());
 </script>
 
 <template>
-  <router-view
-    class="pr-5 pt-1 text-xl font-bold text-gray-50 text-opacity-20"
-  />
+  <router-view />
 </template>
