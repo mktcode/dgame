@@ -50,24 +50,27 @@ watch(
       class="aspect-square w-full rounded-t-xl"
       style="image-rendering: optimizeSpeed"
     />
-    <div class="grid grid-cols-3 gap-1 rounded-b-xl bg-sky-800">
-      <button @click="move(Direction.Backward)">
+    <div class="grid grid-cols-3 rounded-b-xl bg-sky-900">
+      <button @click="move(Direction.Backward)" class="rounded-t-none rounded-l-none">
         <svg-icon type="mdi" :path="mdiMagnifyMinus" class="inline" />
       </button>
-      <button @click="move(Direction.Up)">
+      <button @click="move(Direction.Up)" class="rounded-t-none">
         <svg-icon type="mdi" :path="mdiChevronUp" class="inline" />
       </button>
-      <button @click="move(Direction.Forward)">
+      <button @click="move(Direction.Forward)" class="rounded-t-none rounded-r-none">
         <svg-icon type="mdi" :path="mdiMagnifyPlus" class="inline" />
       </button>
-      <button @click="move(Direction.Left)">
+      <button @click="move(Direction.Left)" class="rounded-l-none">
         <svg-icon type="mdi" :path="mdiChevronLeft" class="inline" />
       </button>
       <button @click="move(Direction.Down)">
         <svg-icon type="mdi" :path="mdiChevronDown" class="inline" />
       </button>
-      <button @click="move(Direction.Right)">
+      <button @click="move(Direction.Right)" class="rounded-r-none">
         <svg-icon type="mdi" :path="mdiChevronRight" class="inline" />
+      </button>
+      <button @click="" class="col-span-3 rounded-t-none">
+        mint
       </button>
     </div>
   </div>

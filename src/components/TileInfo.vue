@@ -145,7 +145,7 @@ const loadImage = () => {
 </script>
 
 <template>
-  <div class="grow overflow-y-auto bg-slate-900">
+  <div class="grow overflow-y-auto">
     <Mandelbrot />
     <Transition name="fade-fast" mode="out-in">
       <div v-if="selectedTileInfo">

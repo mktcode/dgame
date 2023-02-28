@@ -10,9 +10,7 @@ const backgroundPositionY = ref(0);
 const backgroundSize = ref(100);
 const backgroundStyles = computed(() => ({
   backgroundImage: `url(artwork/spaces/space1.jpeg)`,
-  backgroundPositionX: backgroundPositionX.value + "%",
-  backgroundPositionY: backgroundPositionY.value + "%",
-  backgroundSize: backgroundSize.value + "%",
+  backgroundSize: "200%",
 }));
 
 let movingIsBlocked = false;
