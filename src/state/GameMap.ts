@@ -3,6 +3,7 @@ import type { Coordinate } from "@/lib/coordinates";
 import { Direction } from "@/lib/game";
 
 const gameMap = ref<HTMLElement | null>(null);
+const zoomed = ref(true);
 const position = ref<Coordinate>({ x: 0n, y: 0n, z: 0n });
 const selectedCoordinate = ref<Coordinate>({ x: 1n, y: 1n, z: 0n });
 const backgroundPositionX = ref(0);
@@ -81,6 +82,7 @@ function moveBackward() {
 export function GameMapState() {
   return {
     gameMap,
+    zoomed,
     position,
     selectedCoordinate,
     move,

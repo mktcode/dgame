@@ -3,8 +3,12 @@ import TileInfo from "@/components/TileInfo.vue";
 import { GameMapState } from "@/state/GameMap";
 import { IS_ETHEREUM_ENABLED, useWeb3Account } from "@/state/useWeb3Account";
 
-const { selectedCoordinate } = GameMapState();
+const { selectedCoordinate, zoomed } = GameMapState();
 const { accountAddress, connect, shortenAddress } = useWeb3Account();
+
+function toggleZoom() {
+  zoomed.value = !zoomed.value;
+}
 </script>
 
 <template>
@@ -16,7 +20,13 @@ const { accountAddress, connect, shortenAddress } = useWeb3Account();
   >
     <TileInfo />
 
-    <div class="mt-3">
+    <div class="mt-3 space-y-2">
+      <div>
+        <button @click="toggleZoom" class="w-full">
+          <span v-if="zoomed">Zoom Out</span>
+          <span v-else>Zoom In</span>
+        </button>
+      </div>
       <div v-if="accountAddress" class="py-1 text-center text-sky-900">
         {{ shortenAddress(accountAddress) }}
       </div>
