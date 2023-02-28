@@ -5,21 +5,52 @@ import { playAudio } from "@/lib/audio";
 import { GameMapState } from "@/state/GameMap";
 import { useDGameContract } from "@/state/useDGameContract";
 import { useWeb3Account, IS_ETHEREUM_ENABLED } from "@/state/useWeb3Account";
-import { getMintPriceForAccount } from "@/lib/game";
+import { Direction, getMintPriceForAccount } from "@/lib/game";
+import { INITIAL_ZOOM, MandelbrotState } from "@/state/MandelbrotState";
+import GIF from "gif.js";
 
 const { selectedCoordinate } = GameMapState();
+const { canvas, currentZoom, move, drawMandelbrotSet } = MandelbrotState();
 const { connect, accountBalance } = useWeb3Account();
 
 const isMinting = ref(false);
 const imageUrl = ref<string | null>(null);
 
 async function mintNft() {
-  if (!selectedCoordinate.value) return;
+  if (!canvas.value) return;
 
+  console.log("mintNft")
   playAudio("button");
 
   const { account } = await connect();
   const { dgameContract } = await useDGameContract(account);
+
+  const targetZoom = currentZoom.value;
+
+  currentZoom.value = 0.001;
+  drawMandelbrotSet();
+
+  const gif = new GIF({
+    workers: 2,
+    quality: 3,
+    // repeat: -1,
+  });
+
+  while (currentZoom.value < targetZoom) {
+    move(Direction.Forward);
+    drawMandelbrotSet();
+    gif.addFrame(canvas.value, { delay: 80, copy: true });
+    imageUrl.value = canvas.value.toDataURL("image/png", 1.0);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+
+  gif.on('finished', function(blob) {
+    window.open(URL.createObjectURL(blob));
+  });
+  
+  gif.render();
+
+  return;
 
   const coords = {
     x: selectedCoordinate.value.x.toString(),
@@ -55,14 +86,15 @@ async function mintNft() {
       class="aspect-square overflow-hidden rounded-xl border-8 border-slate-800 bg-sky-900 bg-cover"
       :style="{
         backgroundImage: `url(${imageUrl || 'artwork/base2.jpeg'})`,
+        imageRendering: 'pixelated',
       }"
     >
       <div
-        class="flex h-full grow cursor-pointer items-center justify-center bg-slate-900 bg-opacity-90 text-center text-2xl font-bold text-white"
+        class="flex h-full grow cursor-pointer items-center justify-center text-center text-2xl font-bold text-white"
       >
         <div v-if="isMinting">deploying...</div>
-        <div v-else>
-          Deploy Base<br />
+        <div v-else @click="mintNft">
+          Deploy Baaaase<br />
           {{ formatEther(getMintPriceForAccount(accountBalance)) }} ETH
         </div>
       </div>

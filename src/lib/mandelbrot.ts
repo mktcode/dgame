@@ -1,4 +1,4 @@
-const MAX_ITERATIONS = 100;
+const MAX_ITERATIONS = 250;
 
 export function isInMandelbrotSet(x0: number, y0: number) {
   let x = 0;

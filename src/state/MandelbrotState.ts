@@ -2,7 +2,6 @@ import { Direction } from "@/lib/game";
 import {
   isInMandelbrotSet,
   getRainbowColor,
-  approachValue,
 } from "@/lib/mandelbrot";
 import { ref } from "vue";
 
@@ -12,17 +11,18 @@ const YMIN = -0.1;
 const YMAX = 0.1;
 
 const ZOOM_FACTOR = 1.1;
-const INITIAL_ZOOM = 0.1;
+export const INITIAL_ZOOM = 0.1;
 const INITIAL_OFFSET_X = 0;
 const INITIAL_OFFSET_Y = 0;
 const MOVEMENT_FACTOR = 1;
 
-export function MandelbrotState() {
-  const canvas = ref<HTMLCanvasElement | null>(null);
+const canvas = ref<HTMLCanvasElement | null>(null);
 
-  const currentZoom = ref(INITIAL_ZOOM);
-  const currentOffsetX = ref(INITIAL_OFFSET_X);
-  const currentOffsetY = ref(INITIAL_OFFSET_Y);
+const currentZoom = ref(INITIAL_ZOOM);
+const currentOffsetX = ref(INITIAL_OFFSET_X);
+const currentOffsetY = ref(INITIAL_OFFSET_Y);
+
+export function MandelbrotState() {
 
   function move(direction: Direction) {
     if (!canvas.value) return;
@@ -47,6 +47,7 @@ export function MandelbrotState() {
         currentZoom.value /= ZOOM_FACTOR;
         break;
     }
+    // console.log("Moved", currentOffsetX.value, currentOffsetY.value, currentZoom.value)
 
     drawMandelbrotSet();
   }

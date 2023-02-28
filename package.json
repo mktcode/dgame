@@ -16,9 +16,11 @@
     "@mdi/js": "^7.1.96",
     "@openzeppelin/contracts": "^4.8.1",
     "@snapshot-labs/pineapple": "^0.1.0-beta.1",
+    "@types/gif.js": "^0.2.2",
     "@vueuse/core": "^9.12.0",
     "@web3gun/client": "^1.1.0",
     "ethers": "^6.0.3",
+    "gif.js": "^0.2.0",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"
   },

@@ -34,8 +34,8 @@ watch(
   canvas,
   () => {
     if (canvas.value) {
-      canvas.value.width = 25;
-      canvas.value.height = 25;
+      canvas.value.width = 150;
+      canvas.value.height = 150;
       drawMandelbrotSet();
     }
   },
@@ -60,17 +60,14 @@ watch(
       <button @click="move(Direction.Forward)" class="rounded-t-none rounded-r-none">
         <svg-icon type="mdi" :path="mdiMagnifyPlus" class="inline" />
       </button>
-      <button @click="move(Direction.Left)" class="rounded-l-none">
+      <button @click="move(Direction.Left)" class="rounded-tl-none rounded-br-none">
         <svg-icon type="mdi" :path="mdiChevronLeft" class="inline" />
       </button>
-      <button @click="move(Direction.Down)">
+      <button @click="move(Direction.Down)" class="rounded-b-none">
         <svg-icon type="mdi" :path="mdiChevronDown" class="inline" />
       </button>
-      <button @click="move(Direction.Right)" class="rounded-r-none">
+      <button @click="move(Direction.Right)" class="rounded-tr-none rounded-bl-none">
         <svg-icon type="mdi" :path="mdiChevronRight" class="inline" />
-      </button>
-      <button @click="" class="col-span-3 rounded-t-none">
-        mint
       </button>
     </div>
   </div>
