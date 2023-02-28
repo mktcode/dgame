@@ -19,10 +19,26 @@ indexer.contract(ADDRESS, DGAME_ABI, async (dgameContract) => {
       const ownerBalance = await dgameContract.balanceOf(owner);
 
       contractStorage.get("balances").get(owner).put(ownerBalance.toString());
-      contractStorage.get("tokens").get(tokenId.toString()).get("owner").put(owner);
-      contractStorage.get("tokens").get(tokenId.toString()).get("level").put("0");
-      contractStorage.get("tokens").get(tokenId.toString()).get("type").put("base");
-      contractStorage.get("tokens").get(tokenId.toString()).get("name").put("Base");
+      contractStorage
+        .get("tokens")
+        .get(tokenId.toString())
+        .get("owner")
+        .put(owner);
+      contractStorage
+        .get("tokens")
+        .get(tokenId.toString())
+        .get("level")
+        .put("0");
+      contractStorage
+        .get("tokens")
+        .get(tokenId.toString())
+        .get("type")
+        .put("base");
+      contractStorage
+        .get("tokens")
+        .get(tokenId.toString())
+        .get("name")
+        .put("Base");
       contractStorage
         .get("tokens")
         .get(tokenId.toString())
@@ -43,14 +59,17 @@ indexer.contract(ADDRESS, DGAME_ABI, async (dgameContract) => {
     }
   );
 
-  dgameContract.on("LevelUp", async (tokenId: bigint, newLevel: bigint, newUri) => {
-    console.log("LevelUp", tokenId, newLevel, newUri);
-    contractStorage
-      .get("tokens")
-      .get(tokenId.toString())
-      .get("level")
-      .put(newLevel.toString());
-  });
+  dgameContract.on(
+    "LevelUp",
+    async (tokenId: bigint, newLevel: bigint, newUri) => {
+      console.log("LevelUp", tokenId, newLevel, newUri);
+      contractStorage
+        .get("tokens")
+        .get(tokenId.toString())
+        .get("level")
+        .put(newLevel.toString());
+    }
+  );
 });
 
 indexer.replay();

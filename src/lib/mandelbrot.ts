@@ -1,4 +1,4 @@
-const MAX_ITERATIONS = 500;
+const MAX_ITERATIONS = 100;
 
 export function isInMandelbrotSet(x0: number, y0: number) {
   let x = 0;
@@ -19,7 +19,7 @@ export function getRainbowColor(iterCount: number) {
   if (iterCount === -1) {
     return "#000";
   } else {
-    const hue = iterCount / MAX_ITERATIONS * 360;
+    const hue = (iterCount / MAX_ITERATIONS) * 360;
     return `hsl(${hue}, 100%, 50%)`;
   }
 }
@@ -29,7 +29,7 @@ export async function* approachValue(
   target: number,
   steps: number,
   duration: number,
-  easing: ((t: number) => number) = t => t
+  easing: (t: number) => number = (t) => t
 ): AsyncGenerator<number> {
   const stepDuration = duration / steps;
   let currentValue = start;

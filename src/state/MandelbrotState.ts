@@ -1,16 +1,20 @@
 import { Direction } from "@/lib/game";
-import { isInMandelbrotSet, getRainbowColor, approachValue } from "@/lib/mandelbrot";
+import {
+  isInMandelbrotSet,
+  getRainbowColor,
+  approachValue,
+} from "@/lib/mandelbrot";
 import { ref } from "vue";
 
-const XMIN = -.1;
-const XMAX = .1;
-const YMIN = -.1;
-const YMAX = .1;
+const XMIN = -0.1;
+const XMAX = 0.1;
+const YMIN = -0.1;
+const YMAX = 0.1;
 
 const ZOOM_FACTOR = 1.1;
-const INITIAL_ZOOM = 71.79517789085845;
-const INITIAL_OFFSET_X = -280.3066026770185;
-const INITIAL_OFFSET_Y = 278.61772214326425;
+const INITIAL_ZOOM = 0.09999999999999992;
+const INITIAL_OFFSET_X = -243.1636363636366;
+const INITIAL_OFFSET_Y = 0;
 const MOVEMENT_FACTOR = 1;
 
 export function MandelbrotState() {
@@ -22,7 +26,7 @@ export function MandelbrotState() {
 
   function move(direction: Direction) {
     if (!canvas.value) return;
-  
+
     switch (direction) {
       case Direction.Up:
         currentOffsetY.value -= MOVEMENT_FACTOR / currentZoom.value;
@@ -43,7 +47,7 @@ export function MandelbrotState() {
         currentZoom.value /= ZOOM_FACTOR;
         break;
     }
-  
+
     drawMandelbrotSet();
   }
 
@@ -52,19 +56,23 @@ export function MandelbrotState() {
 
     const ctx = canvas.value.getContext("2d");
     if (!ctx) return;
-  
+
     // console.log("Drawing Mandelbrot Set", currentOffsetX.value, currentOffsetY.value, currentZoom.value)
-    
+
     const canvasWidth = canvas.value.width;
     const canvasHeight = canvas.value.height;
     const xRange = (XMAX - XMIN) / currentZoom.value;
     const yRange = (YMAX - YMIN) / currentZoom.value;
-    const centerX = (XMAX + XMIN) / 2 + currentOffsetX.value / canvasWidth * xRange;
-    const centerY = (YMAX + YMIN) / 2 + currentOffsetY.value / canvasHeight * yRange;
+    const centerX =
+      (XMAX + XMIN) / 2 + (currentOffsetX.value / canvasWidth) * xRange;
+    const centerY =
+      (YMAX + YMIN) / 2 + (currentOffsetY.value / canvasHeight) * yRange;
     for (let i = 0; i < canvasWidth; i++) {
       for (let j = 0; j < canvasHeight; j++) {
-        const x = ((centerX * currentZoom.value) + (i / canvasWidth - 0.5) * xRange);
-        const y = ((centerY * currentZoom.value) + (j / canvasHeight - 0.5) * yRange);
+        const x =
+          centerX * currentZoom.value + (i / canvasWidth - 0.5) * xRange;
+        const y =
+          centerY * currentZoom.value + (j / canvasHeight - 0.5) * yRange;
         const iterCount = isInMandelbrotSet(x, y);
         ctx.fillStyle = getRainbowColor(iterCount);
         ctx.fillRect(i, j, 1, 1);
@@ -72,12 +80,27 @@ export function MandelbrotState() {
     }
   }
 
-  async function zoomToTarget(xOffsetTarget: number, yOffsetTarget: number, zoomTarget: number, canvas: HTMLCanvasElement | null) {
+  async function zoomToTarget(
+    xOffsetTarget: number,
+    yOffsetTarget: number,
+    zoomTarget: number,
+    canvas: HTMLCanvasElement | null
+  ) {
     if (!canvas) return;
     const STEPS = 25;
     const DURATION = 250;
-    const xGenerator = approachValue(currentOffsetX.value, xOffsetTarget, STEPS, DURATION);
-    const yGenerator = approachValue(currentOffsetY.value, yOffsetTarget, STEPS, DURATION);
+    const xGenerator = approachValue(
+      currentOffsetX.value,
+      xOffsetTarget,
+      STEPS,
+      DURATION
+    );
+    const yGenerator = approachValue(
+      currentOffsetY.value,
+      yOffsetTarget,
+      STEPS,
+      DURATION
+    );
 
     if (currentZoom.value < zoomTarget) {
       setTimeout(async () => {
@@ -86,12 +109,12 @@ export function MandelbrotState() {
           drawMandelbrotSet();
         }
       }, 0);
-    
+
       for await (const newYOffset of yGenerator) {
         currentOffsetY.value = newYOffset;
         drawMandelbrotSet();
       }
-    
+
       if (currentZoom.value < zoomTarget) {
         while (currentZoom.value < zoomTarget) {
           currentZoom.value *= ZOOM_FACTOR;
@@ -126,7 +149,7 @@ export function MandelbrotState() {
           drawMandelbrotSet();
         }
       }, 0);
-    
+
       for await (const newYOffset of yGenerator) {
         currentOffsetY.value = newYOffset;
         drawMandelbrotSet();

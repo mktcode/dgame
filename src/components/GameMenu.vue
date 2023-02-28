@@ -9,7 +9,7 @@ const { accountAddress, connect, shortenAddress } = useWeb3Account();
 
 <template>
   <div
-    class="flex overflow-hidden flex-none flex-col w-full absolute inset-0 sm:relative sm:w-72"
+    class="absolute inset-0 flex w-full flex-none flex-col overflow-hidden sm:relative sm:w-72"
     :class="{
       'hidden sm:flex': !selectedCoordinate,
     }"
@@ -20,7 +20,11 @@ const { accountAddress, connect, shortenAddress } = useWeb3Account();
       <div v-if="accountAddress" class="py-1 text-center text-sky-900">
         {{ shortenAddress(accountAddress) }}
       </div>
-      <button v-if="!accountAddress && IS_ETHEREUM_ENABLED" @click="connect" class="w-full flex flex-col text-xl">
+      <button
+        v-if="!accountAddress && IS_ETHEREUM_ENABLED"
+        @click="connect"
+        class="flex w-full flex-col text-xl"
+      >
         Connect Wallet
         <span class="text-sm text-sky-600">with goerli testnet</span>
       </button>

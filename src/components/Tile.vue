@@ -62,10 +62,7 @@ function clickTile() {
 </script>
 
 <template>
-  <div
-    class="relative flex aspect-square w-40 min-w-[6rem]"
-    @click="clickTile"
-  >
+  <div class="relative flex aspect-square w-40 min-w-[6rem]" @click="clickTile">
     <div
       class="absolute inset-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg border-4 border-sky-900 bg-sky-900 text-sm transition-all"
       :class="{
@@ -75,7 +72,11 @@ function clickTile() {
       }"
     >
       <Transition>
-        <img v-if="tileInfo && tileInfo.image" :src="tileInfo.image" alt="Tile" />
+        <img
+          v-if="tileInfo && tileInfo.image"
+          :src="tileInfo.image"
+          alt="Tile"
+        />
       </Transition>
     </div>
   </div>

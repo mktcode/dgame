@@ -5,7 +5,7 @@ import GameMenu from "./components/GameMenu.vue";
 </script>
 
 <template>
-  <div class="flex h-screen p-3 space-x-3">
+  <div class="flex h-screen space-x-3 p-3">
     <GameMap />
     <GameMenu />
   </div>

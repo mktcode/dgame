@@ -19,7 +19,9 @@ export interface CoordinateLike {
   z: BigIntLike;
 }
 
-export function isCoordinateLike(coordinate: unknown): coordinate is CoordinateLike {
+export function isCoordinateLike(
+  coordinate: unknown
+): coordinate is CoordinateLike {
   return (
     typeof coordinate === "object" &&
     coordinate !== null &&
@@ -64,10 +66,10 @@ function getNumberBetween(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-export function randomCoordinate(): { x: bigint, y: bigint, z: bigint } {
+export function randomCoordinate(): { x: bigint; y: bigint; z: bigint } {
   return {
     x: BigInt(getNumberBetween(-1000000000, 1000000000)),
     y: BigInt(getNumberBetween(-1000000000, 1000000000)),
     z: BigInt(getNumberBetween(-1000000000, 1000000000)),
-  }
+  };
 }

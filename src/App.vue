@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
-import { randomCoordinate, isCoordinateLike, toCoordinate } from '@/lib/coordinates';
-import { GameMapState } from './state/GameMap';
+import { useRoute } from "vue-router";
+import {
+  randomCoordinate,
+  isCoordinateLike,
+  toCoordinate,
+} from "@/lib/coordinates";
+import { GameMapState } from "./state/GameMap";
 
 const route = useRoute();
 
@@ -11,7 +15,7 @@ const storedPosition = {
   x: localStorage.getItem("x"),
   y: localStorage.getItem("y"),
   z: localStorage.getItem("z"),
-}
+};
 
 if (isCoordinateLike(route.params)) {
   position.value = toCoordinate(route.params);
@@ -27,5 +31,7 @@ localStorage.setItem("z", position.value.z.toString());
 </script>
 
 <template>
-  <router-view />
+  <router-view
+    class="pr-5 pt-1 text-xl font-bold text-gray-50 text-opacity-20"
+  />
 </template>

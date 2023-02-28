@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch } from "vue";
 import SvgIcon from "@jamescoyle/vue-icon";
 import {
   mdiChevronLeft,
@@ -10,44 +10,61 @@ import {
   mdiMagnifyMinus,
 } from "@mdi/js";
 import { Direction } from "@/lib/game";
-import { GameMapState } from '@/state/GameMap';
-import { MandelbrotState } from '@/state/MandelbrotState';
+import { GameMapState } from "@/state/GameMap";
+import { MandelbrotState } from "@/state/MandelbrotState";
 
 const { position } = GameMapState();
-const { canvas, drawMandelbrotSet, move, zoomToTarget, currentZoom, currentOffsetX, currentOffsetY } = MandelbrotState();
+const {
+  canvas,
+  drawMandelbrotSet,
+  move,
+  zoomToTarget,
+  currentZoom,
+  currentOffsetX,
+  currentOffsetY,
+} = MandelbrotState();
 
-watch(position, () => {
-  if (canvas.value) {
-    drawMandelbrotSet();
-  }
-}, { immediate: true, deep: true });
+watch(
+  position,
+  () => {
+    if (canvas.value) {
+      drawMandelbrotSet();
+    }
+  },
+  { immediate: true, deep: true }
+);
 
-watch(canvas, () => {
-  if (canvas.value) {
-    canvas.value.width = 100;
-    canvas.value.height = 100;
-    drawMandelbrotSet();
-  }
-}, { immediate: true });
+watch(
+  canvas,
+  () => {
+    if (canvas.value) {
+      canvas.value.width = 150;
+      canvas.value.height = 150;
+      drawMandelbrotSet();
+    }
+  },
+  { immediate: true }
+);
 
 const targets = [
-  [ 62.51 * 2, 0, 100000.9 * 2 ],
-  [ 0, 0, 0.1 ],
-  [ -179.67670033502017 * 2, -70 * 2, 10.671895716335978 * 2 ],
-  [ -177.42780279723215 * 2, -70 * 2, 399.17525258063944 * 2 ],
-  [ -177.42780279723215 * 2, -70 * 2, 5399.17525258063944 * 2 ],
-  [ -179.48929220687117 * 2, -56.41334259080523 * 2, 1.1 * 2],
-  [ -140.15330133850924 * 2, 139.30886107163212 * 2, 35.2892739326841 * 2],
-  [ 0, 0, 0.01 ]
-]
+  [62.51 * 2, 0, 100000.9 * 2],
+  [0, 0, 0.1],
+  [-179.67670033502017 * 2, -70 * 2, 10.671895716335978 * 2],
+  [-177.42780279723215 * 2, -70 * 2, 399.17525258063944 * 2],
+  [-177.42780279723215 * 2, -70 * 2, 5399.17525258063944 * 2],
+  [-179.48929220687117 * 2, -56.41334259080523 * 2, 1.1 * 2],
+  [-140.15330133850924 * 2, 139.30886107163212 * 2, 35.2892739326841 * 2],
+  [0, 0, 0.01],
+  [-473.9943674308014, -348.81955981115823, 859497144.1069316],
+];
 let currentTarget = 0;
 const isPlaying = ref(false);
 const isMoving = ref(false);
 
 async function moveNext() {
   isMoving.value = true;
-  const [ x, y, z ] = targets[currentTarget];
-  await zoomToTarget(x, y ,z, canvas.value);
+  const [x, y, z] = targets[currentTarget];
+  await zoomToTarget(x, y, z, canvas.value);
   isMoving.value = false;
   currentTarget++;
   if (currentTarget >= targets.length) {
@@ -65,19 +82,19 @@ async function movePrev() {
   if (currentTarget < 0) {
     currentTarget = targets.length - 1;
   }
-  
-  const [ x, y, z ] = targets[currentTarget];
-  await zoomToTarget(x, y ,z, canvas.value);
+
+  const [x, y, z] = targets[currentTarget];
+  await zoomToTarget(x, y, z, canvas.value);
   isMoving.value = false;
 }
 </script>
 
 <template>
-  <div class="mb-3 p-2 bg-sky-900 rounded-xl">
+  <div class="mb-3 rounded-xl bg-sky-900 p-2">
     <canvas
       ref="canvas"
-      class="w-full aspect-square rounded-t-xl"
-      style="image-rendering: optimizeSpeed;"
+      class="aspect-square w-full rounded-t-xl"
+      style="image-rendering: optimizeSpeed"
     />
     <div class="grid grid-cols-3 gap-1 rounded-b-xl bg-sky-800">
       <button :disabled="isMoving" @click="move(Direction.Backward)">
@@ -105,7 +122,7 @@ async function movePrev() {
         next
       </button>
       <button @click="isPlaying = !isPlaying" class="col-span-1">
-        {{ isPlaying ? 'stop' : 'play' }}
+        {{ isPlaying ? "stop" : "play" }}
       </button>
     </div>
     x: {{ currentOffsetX }}<br />

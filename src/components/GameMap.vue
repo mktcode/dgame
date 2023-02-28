@@ -30,7 +30,7 @@ const visibleTilesY = computed(() => {
 <template>
   <div
     ref="gameMap"
-    class="grow relative overflow-hidden border-4 border-sky-900 border-opacity-10 transition-all hover:border-opacity-30 focus:border-opacity-100 rounded-3xl"
+    class="relative grow overflow-hidden rounded-3xl border-4 border-sky-900 border-opacity-10 transition-all hover:border-opacity-30 focus:border-opacity-100"
     tabindex="1"
     @keyup.left="move(Direction.Left)"
     @keyup.right="move(Direction.Right)"
@@ -40,7 +40,7 @@ const visibleTilesY = computed(() => {
     @keyup.shift.up="move(Direction.Forward)"
   >
     <div
-      class="absolute overflow-hidden bg-cover bg-blend-multiply bg-slate-900 space-y-2 p-2"
+      class="absolute space-y-2 overflow-hidden bg-slate-900 bg-cover p-2 bg-blend-multiply"
       :style="backgroundStyles"
     >
       <div

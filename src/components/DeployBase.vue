@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { formatEther } from 'ethers';
-import { playAudio } from '@/lib/audio';
-import { GameMapState } from '@/state/GameMap';
-import { useDGameContract } from '@/state/useDGameContract';
-import { useWeb3Account, IS_ETHEREUM_ENABLED } from '@/state/useWeb3Account';
-import { getMintPriceForAccount } from '@/lib/game';
+import { ref } from "vue";
+import { formatEther } from "ethers";
+import { playAudio } from "@/lib/audio";
+import { GameMapState } from "@/state/GameMap";
+import { useDGameContract } from "@/state/useDGameContract";
+import { useWeb3Account, IS_ETHEREUM_ENABLED } from "@/state/useWeb3Account";
+import { getMintPriceForAccount } from "@/lib/game";
 
 const { selectedCoordinate } = GameMapState();
 const { connect, accountBalance } = useWeb3Account();
@@ -52,7 +52,7 @@ async function mintNft() {
   <div>
     <div
       v-if="IS_ETHEREUM_ENABLED"
-      class="aspect-square bg-sky-900 bg-cover rounded-xl border-8 border-slate-800 overflow-hidden"
+      class="aspect-square overflow-hidden rounded-xl border-8 border-slate-800 bg-sky-900 bg-cover"
       :style="{
         backgroundImage: `url(${imageUrl || 'artwork/base2.jpeg'})`,
       }"

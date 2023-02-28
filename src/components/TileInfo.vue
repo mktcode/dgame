@@ -3,7 +3,7 @@ import { computed, ref, watch } from "vue";
 import { formatEther } from "ethers";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiCamera } from "@mdi/js";
-import { pin, upload } from '@snapshot-labs/pineapple';
+import { pin, upload } from "@snapshot-labs/pineapple";
 import { GameMapState } from "../state/GameMap";
 import { contractStorage } from "../state/Indexer";
 import { useWeb3Account } from "../state/useWeb3Account";
@@ -19,7 +19,9 @@ const { selectedCoordinate, position } = GameMapState();
 const selectedTileInfo = ref<TileInfo | null>(null);
 const existingTokenId = ref<bigint | null>(null);
 
-const isOwner = computed(() => selectedTileInfo.value?.owner === accountAddress.value)
+const isOwner = computed(
+  () => selectedTileInfo.value?.owner === accountAddress.value
+);
 
 watch(
   selectedCoordinate,
@@ -89,23 +91,30 @@ async function levelUp() {
   let uploadedFile = null;
   if (file) {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
     uploadedFile = await upload(formData);
   }
 
   const nftMetadata = {
     name: "Base 1",
     description: "A player's base",
-    image: 'ipfs://ipfs/' + uploadedFile ? uploadedFile.cid : selectedTileInfo.value.image,
+    image:
+      "ipfs://ipfs/" + uploadedFile
+        ? uploadedFile.cid
+        : selectedTileInfo.value.image,
   };
   const receipt = await pin(nftMetadata);
 
   try {
     playAudio("requesting-permission");
 
-    const tx = await dgameContract.levelUp(existingTokenId.value.toString(), 'ipfs://ipfs/' + receipt.cid, {
-      value: getTokenLevelPrice(selectedTileInfo.value.level),
-    });
+    const tx = await dgameContract.levelUp(
+      existingTokenId.value.toString(),
+      "ipfs://ipfs/" + receipt.cid,
+      {
+        value: getTokenLevelPrice(selectedTileInfo.value.level),
+      }
+    );
 
     playAudio("upgrading-base");
 
@@ -137,18 +146,33 @@ const loadImage = () => {
 
 <template>
   <div class="grow overflow-y-auto bg-slate-900">
-    <div class="flex flex-col text-xl font-bold text-sky-100 mb-3">
+    <div class="mb-3 flex flex-col text-xl font-bold text-sky-100">
       <div class="flex items-center">
-        <span class="text-sky-900 mr-2">x</span>
-        <input type="text" v-model="selectedCoordinate.x" @change="position = selectedCoordinate" class="bg-transparent text-sky-100 focus:bg-sky-900 w-full rounded px-2" />
+        <span class="mr-2 text-sky-900">x</span>
+        <input
+          type="text"
+          v-model="selectedCoordinate.x"
+          @change="position = selectedCoordinate"
+          class="w-full rounded bg-transparent px-2 text-sky-100 focus:bg-sky-900"
+        />
       </div>
       <div class="flex items-center">
-        <span class="text-sky-900 mr-2">y</span>
-        <input type="text" v-model="selectedCoordinate.y" @change="position = selectedCoordinate" class="bg-transparent text-sky-100 focus:bg-sky-900 w-full rounded px-2" />
+        <span class="mr-2 text-sky-900">y</span>
+        <input
+          type="text"
+          v-model="selectedCoordinate.y"
+          @change="position = selectedCoordinate"
+          class="w-full rounded bg-transparent px-2 text-sky-100 focus:bg-sky-900"
+        />
       </div>
       <div class="flex items-center">
-        <span class="text-sky-900 mr-2">z</span>
-        <input type="text" v-model="selectedCoordinate.z" @change="position = selectedCoordinate" class="bg-transparent text-sky-100 focus:bg-sky-900 w-full rounded px-2" />
+        <span class="mr-2 text-sky-900">z</span>
+        <input
+          type="text"
+          v-model="selectedCoordinate.z"
+          @change="position = selectedCoordinate"
+          class="w-full rounded bg-transparent px-2 text-sky-100 focus:bg-sky-900"
+        />
       </div>
     </div>
     <Mandelbrot />
@@ -156,30 +180,32 @@ const loadImage = () => {
       <div v-if="selectedTileInfo">
         <template v-if="isOwner">
           <img v-if="imageUrl" :src="imageUrl" :alt="selectedTileInfo.name" />
-          <div v-else @click="imageInput?.click()" class="cursor-pointer relative">
-            <div class="flex items-center justify-center absolute inset-0 opacity-0 hover:opacity-20 transition-opacity">
-              <svg-icon type="mdi" :path="mdiCamera" class="w-24 h-24" />
+          <div
+            v-else
+            @click="imageInput?.click()"
+            class="relative cursor-pointer"
+          >
+            <div
+              class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity hover:opacity-20"
+            >
+              <svg-icon type="mdi" :path="mdiCamera" class="h-24 w-24" />
             </div>
-            <img
-              :src="selectedTileInfo.image"
-              :alt="selectedTileInfo.name"
-            />
+            <img :src="selectedTileInfo.image" :alt="selectedTileInfo.name" />
           </div>
         </template>
         <template v-else>
-          <img
-            :src="selectedTileInfo.image"
-            :alt="selectedTileInfo.name"
-          />
+          <img :src="selectedTileInfo.image" :alt="selectedTileInfo.name" />
         </template>
 
-        <input type="file" ref="imageInput" @change="loadImage" accept="image/*" class="hidden" />
-        
-        <button
-          v-if="isOwner"
-          class="w-full"
-          @click="levelUp"
-        >
+        <input
+          type="file"
+          ref="imageInput"
+          @change="loadImage"
+          accept="image/*"
+          class="hidden"
+        />
+
+        <button v-if="isOwner" class="w-full" @click="levelUp">
           Level up for
           {{ formatEther(getTokenLevelPrice(selectedTileInfo.level)) }} ETH
         </button>
