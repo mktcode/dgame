@@ -9,7 +9,7 @@ const { accountAddress, connect, shortenAddress } = useWeb3Account();
 
 <template>
   <div
-    class="flex p-2 flex-none flex-col overflow-hidden sm:relative w-80"
+    class="flex flex-none flex-col overflow-hidden sm:relative w-80"
     :class="{
       'hidden sm:flex': !selectedCoordinate,
     }"
