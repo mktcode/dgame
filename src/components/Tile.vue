@@ -6,8 +6,8 @@ const props = defineProps<{
   index: number;
 }>();
 
-const x = computed(() => Math.floor(props.index / 12));
-const y = computed(() => props.index % 12);
+const x = computed(() => Math.floor(props.index / 10));
+const y = computed(() => props.index % 10);
 
 function clickTile() {
   playAudio("button");
