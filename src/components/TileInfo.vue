@@ -146,35 +146,6 @@ const loadImage = () => {
 
 <template>
   <div class="grow overflow-y-auto bg-slate-900">
-    <div class="mb-3 flex flex-col text-xl font-bold text-sky-100">
-      <div class="flex items-center">
-        <span class="mr-2 text-sky-900">x</span>
-        <input
-          type="text"
-          v-model="selectedCoordinate.x"
-          @change="position = selectedCoordinate"
-          class="w-full rounded bg-transparent px-2 text-sky-100 focus:bg-sky-900"
-        />
-      </div>
-      <div class="flex items-center">
-        <span class="mr-2 text-sky-900">y</span>
-        <input
-          type="text"
-          v-model="selectedCoordinate.y"
-          @change="position = selectedCoordinate"
-          class="w-full rounded bg-transparent px-2 text-sky-100 focus:bg-sky-900"
-        />
-      </div>
-      <div class="flex items-center">
-        <span class="mr-2 text-sky-900">z</span>
-        <input
-          type="text"
-          v-model="selectedCoordinate.z"
-          @change="position = selectedCoordinate"
-          class="w-full rounded bg-transparent px-2 text-sky-100 focus:bg-sky-900"
-        />
-      </div>
-    </div>
     <Mandelbrot />
     <Transition name="fade-fast" mode="out-in">
       <div v-if="selectedTileInfo">

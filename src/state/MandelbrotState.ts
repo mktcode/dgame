@@ -12,8 +12,8 @@ const YMIN = -0.1;
 const YMAX = 0.1;
 
 const ZOOM_FACTOR = 1.1;
-const INITIAL_ZOOM = 0.09999999999999992;
-const INITIAL_OFFSET_X = -243.1636363636366;
+const INITIAL_ZOOM = 0.1;
+const INITIAL_OFFSET_X = 0;
 const INITIAL_OFFSET_Y = 0;
 const MOVEMENT_FACTOR = 1;
 
@@ -80,83 +80,6 @@ export function MandelbrotState() {
     }
   }
 
-  async function zoomToTarget(
-    xOffsetTarget: number,
-    yOffsetTarget: number,
-    zoomTarget: number,
-    canvas: HTMLCanvasElement | null
-  ) {
-    if (!canvas) return;
-    const STEPS = 25;
-    const DURATION = 250;
-    const xGenerator = approachValue(
-      currentOffsetX.value,
-      xOffsetTarget,
-      STEPS,
-      DURATION
-    );
-    const yGenerator = approachValue(
-      currentOffsetY.value,
-      yOffsetTarget,
-      STEPS,
-      DURATION
-    );
-
-    if (currentZoom.value < zoomTarget) {
-      setTimeout(async () => {
-        for await (const newXOffset of xGenerator) {
-          currentOffsetX.value = newXOffset;
-          drawMandelbrotSet();
-        }
-      }, 0);
-
-      for await (const newYOffset of yGenerator) {
-        currentOffsetY.value = newYOffset;
-        drawMandelbrotSet();
-      }
-
-      if (currentZoom.value < zoomTarget) {
-        while (currentZoom.value < zoomTarget) {
-          currentZoom.value *= ZOOM_FACTOR;
-          drawMandelbrotSet();
-          await new Promise((resolve) => setTimeout(resolve, DURATION / STEPS));
-        }
-      } else {
-        while (currentZoom.value > zoomTarget) {
-          currentZoom.value /= ZOOM_FACTOR;
-          drawMandelbrotSet();
-          await new Promise((resolve) => setTimeout(resolve, DURATION / STEPS));
-        }
-      }
-    } else {
-      if (currentZoom.value < zoomTarget) {
-        while (currentZoom.value < zoomTarget) {
-          currentZoom.value *= ZOOM_FACTOR;
-          drawMandelbrotSet();
-          await new Promise((resolve) => setTimeout(resolve, DURATION / STEPS));
-        }
-      } else {
-        while (currentZoom.value > zoomTarget) {
-          currentZoom.value /= ZOOM_FACTOR;
-          drawMandelbrotSet();
-          await new Promise((resolve) => setTimeout(resolve, DURATION / STEPS));
-        }
-      }
-
-      setTimeout(async () => {
-        for await (const newXOffset of xGenerator) {
-          currentOffsetX.value = newXOffset;
-          drawMandelbrotSet();
-        }
-      }, 0);
-
-      for await (const newYOffset of yGenerator) {
-        currentOffsetY.value = newYOffset;
-        drawMandelbrotSet();
-      }
-    }
-  }
-
   return {
     canvas,
     currentZoom,
@@ -164,6 +87,5 @@ export function MandelbrotState() {
     currentOffsetY,
     move,
     drawMandelbrotSet,
-    zoomToTarget,
   };
 }

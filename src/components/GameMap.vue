@@ -1,61 +1,21 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import Tile from "@/components/Tile.vue";
 import { GameMapState } from "@/state/GameMap";
-import { Direction } from "@/lib/game";
 
-const { gameMap, position, move, backgroundStyles } = GameMapState();
-
-const visibleTilesX = computed(() => {
-  const tiles = [];
-
-  for (let i = position.value.x; i < position.value.x + 10n; i++) {
-    tiles.push(i);
-  }
-
-  return tiles;
-});
-
-const visibleTilesY = computed(() => {
-  const tiles = [];
-
-  for (let i = position.value.y; i < position.value.y + 10n; i++) {
-    tiles.push(i);
-  }
-
-  return tiles;
-});
+const { gameMap, backgroundStyles } = GameMapState();
 </script>
 
 <template>
   <div
     ref="gameMap"
-    class="relative grow overflow-hidden rounded-3xl border-4 border-sky-900 border-opacity-10 transition-all hover:border-opacity-30 focus:border-opacity-100"
+    class="aspect-square rounded-xl border-4 border-sky-900 border-opacity-10 transition-all hover:border-opacity-30 focus:border-opacity-100 bg-slate-900 bg-cover p-1 bg-blend-multiply grid grid-cols-10 gap-1"
     tabindex="1"
-    @keyup.left="move(Direction.Left)"
-    @keyup.right="move(Direction.Right)"
-    @keyup.up.exact="move(Direction.Up)"
-    @keyup.down.exact="move(Direction.Down)"
-    @keyup.shift.down="move(Direction.Backward)"
-    @keyup.shift.up="move(Direction.Forward)"
+    :style="backgroundStyles"
   >
-    <div
-      class="absolute space-y-2 overflow-hidden bg-slate-900 bg-cover p-2 bg-blend-multiply"
-      :style="backgroundStyles"
-    >
-      <div
-        v-for="y in visibleTilesY"
-        :key="`y-${y.toString()}`"
-        class="flex space-x-2"
-      >
-        <Tile
-          v-for="x in visibleTilesX"
-          :key="`${x}-${y}-${position.z.toString()}`"
-          :x="x"
-          :y="y"
-          :z="position.z"
-        />
-      </div>
-    </div>
+    <Tile
+      v-for="i in 10 * 10"
+      :key="`tile-${i}`"
+      :index="i"
+    />
   </div>
 </template>
