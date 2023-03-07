@@ -5,16 +5,16 @@ import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiCamera } from "@mdi/js";
 import { pin, upload } from "@snapshot-labs/pineapple";
 import { GameMapState } from "../state/GameMap";
-import { contractStorage } from "../state/Indexer";
 import { useWeb3Account } from "../state/useWeb3Account";
 import { playAudio } from "@/lib/audio";
 import { useDGameContract } from "@/state/useDGameContract";
 import DeployBase from "./DeployBase.vue";
 import { type TileInfo, getTokenLevelPrice } from "@/lib/game";
 import Mandelbrot from "./Mandelbrot.vue";
+import { fetchTileInfo } from "@/lib/indexer";
 
 const { accountAddress, connect, shortenAddress } = useWeb3Account();
-const { selectedCoordinate, position } = GameMapState();
+const { selectedCoordinate } = GameMapState();
 
 const selectedTileInfo = ref<TileInfo | null>(null);
 const existingTokenId = ref<bigint | null>(null);
@@ -25,51 +25,13 @@ const isOwner = computed(
 
 watch(
   selectedCoordinate,
-  (newValue, oldValue) => {
-    if (oldValue) {
-      contractStorage
-        .get("coords")
-        .get(oldValue.x.toString())
-        .get(oldValue.y.toString())
-        .get(oldValue.z.toString())
-        .off();
-    }
-
-    selectedTileInfo.value = null;
-
+  async (newValue, oldValue) => {
     if (!newValue) {
+      selectedTileInfo.value = null;
       return;
     }
 
-    const coords = {
-      x: newValue.x.toString(),
-      y: newValue.y.toString(),
-      z: newValue.z.toString(),
-    };
-
-    contractStorage
-      .get("coords")
-      .get(coords.x)
-      .get(coords.y)
-      .get(coords.z)
-      .on((tokenId) => {
-        existingTokenId.value = tokenId ? BigInt(tokenId) : null;
-
-        if (typeof tokenId !== "string" || tokenId === "0") {
-          selectedTileInfo.value = null;
-          return;
-        }
-
-        contractStorage
-          .get("tokens")
-          .get(tokenId.toString())
-          .once((data) => {
-            if (data && data.level.length > 0) {
-              data.level = BigInt(data.level);
-            }
-            selectedTileInfo.value = data;
-          });
-      });
+    selectedTileInfo.value = await fetchTileInfo(newValue);
   },
   { immediate: true }
 );
